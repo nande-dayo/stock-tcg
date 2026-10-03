@@ -1,0 +1,3907 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>東証ポケカ：厳選60社決算バトルスタジアム</title>
+<style>
+  :root {
+    --bg-dark: #080c14;
+    --panel-bg: #101624;
+    --text-main: #f8fafc;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    padding: 20px 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-size: 25px;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+    background: linear-gradient(90deg, #38bdf8, #818cf8, #f472b6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  p.subtitle {
+    color: #94a3b8;
+    font-size: 13px;
+  }
+
+  /* セレクターパネル */
+  .matchup-bar {
+    background: var(--panel-bg);
+    border: 1px solid #334155;
+    border-radius: 14px;
+    padding: 10px 18px;
+    max-width: 1040px;
+    width: 100%;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+  }
+
+  .select-group {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .select-group label {
+    font-size: 11px;
+    font-weight: bold;
+    color: #94a3b8;
+  }
+
+  select {
+    background: #1e293b;
+    color: #f8fafc;
+    border: 1px solid #475569;
+    padding: 7px 10px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-weight: bold;
+    cursor: pointer;
+    min-width: 240px;
+  }
+
+  select:focus {
+    outline: none;
+    border-color: #38bdf8;
+  }
+
+  .btn-random {
+    background: #334155;
+    color: #cbd5e1;
+    border: 1px solid #475569;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-random:hover {
+    background: #475569;
+    color: white;
+  }
+
+  /* バトルアリーナ */
+  .arena {
+    background: var(--panel-bg);
+    border: 2px solid #334155;
+    border-radius: 18px;
+    max-width: 1040px;
+    width: 100%;
+    padding: 16px 20px;
+    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.6);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* 巨大アナウンスティッカー */
+  .cutin-banner {
+    width: 100%;
+    min-height: 86px;
+    background: linear-gradient(90deg, rgba(15,23,42,0.96), rgba(30,41,59,0.98), rgba(15,23,42,0.96));
+    border: 2px solid #38bdf8;
+    border-radius: 12px;
+    margin-bottom: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 10px 18px;
+    box-shadow: 0 0 25px rgba(56, 189, 248, 0.35);
+    transition: all 0.3s ease;
+  }
+
+  .cutin-top {
+    font-size: 21px;
+    font-weight: 900;
+    color: #f59e0b;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.9);
+    margin-bottom: 5px;
+  }
+
+  .cutin-bottom {
+    font-size: 15px;
+    font-weight: 700;
+    color: #e2e8f0;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.8);
+    width: 100%;
+  }
+
+  .cutin-bottom .dmg-highlight {
+    color: #ef4444;
+    font-size: 18px;
+    font-weight: 900;
+    text-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
+    margin: 0 3px;
+  }
+
+  .cutin-bottom .buff-highlight {
+    color: #22c55e;
+    font-size: 18px;
+    font-weight: 900;
+    text-shadow: 0 0 10px rgba(34, 197, 94, 0.6);
+    margin: 0 3px;
+  }
+
+  .cutin-bottom .note-highlight {
+    font-size: 13px;
+    color: #94a3b8;
+    font-weight: normal;
+    margin-left: 6px;
+  }
+
+  /* 改行された朝刊ニュース行 */
+  .cutin-news-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    margin-top: 4px;
+  }
+
+  .cutin-news-row {
+    background: rgba(15, 23, 42, 0.65);
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    border-radius: 8px;
+    padding: 6px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 14.5px;
+    line-height: 1.4;
+    flex-wrap: wrap;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  }
+
+  .cutin-news-row.damage-row {
+    border-color: rgba(239, 68, 68, 0.4);
+    background: rgba(239, 68, 68, 0.08);
+  }
+
+  .cutin-news-row.buff-row {
+    border-color: rgba(34, 197, 94, 0.4);
+    background: rgba(34, 197, 94, 0.08);
+  }
+
+  .hp-overheal-badge {
+    color: #38bdf8;
+    font-size: 12px;
+    font-weight: 900;
+    margin-left: 4px;
+    text-shadow: 0 0 8px rgba(56, 189, 248, 0.8);
+  }
+
+  /* 操作コントロールバー（オート／手動送り） */
+  .arena-controls {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .start-btn {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    font-size: 16px;
+    font-weight: 900;
+    padding: 11px 32px;
+    border-radius: 30px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+    transition: all 0.2s;
+  }
+
+  .start-btn:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.6);
+  }
+
+  .start-btn:disabled {
+    background: #475569;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  .ctrl-btn {
+    background: #1e293b;
+    border: 1px solid #475569;
+    color: #f8fafc;
+    padding: 9px 18px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .ctrl-btn:hover:not(:disabled) {
+    background: #334155;
+    border-color: #38bdf8;
+  }
+  .ctrl-btn.active {
+    background: #0284c7;
+    border-color: #38bdf8;
+    color: white;
+  }
+  .ctrl-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .battle-stage {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    gap: 20px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+  }
+
+  .vs-badge {
+    font-size: 32px;
+    font-weight: 900;
+    font-style: italic;
+    color: #f59e0b;
+    text-shadow: 0 0 15px rgba(245, 158, 11, 0.6);
+  }
+
+  .fighter-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* HPバー */
+  .hp-bar-container {
+    width: 310px;
+    background: #090d16;
+    border: 2px solid #475569;
+    border-radius: 10px;
+    padding: 5px 12px;
+  }
+
+  .hp-bar-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12.5px;
+    font-weight: bold;
+    margin-bottom: 3px;
+  }
+
+  .hp-progress {
+    width: 100%;
+    height: 15px;
+    background: #1e293b;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .hp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #22c55e, #16a34a);
+    width: 100%;
+    transition: width 0.5s ease;
+  }
+
+  .hp-fill.danger {
+    background: linear-gradient(90deg, #ef4444, #b91c1c);
+  }
+
+  .hp-fill.overheal {
+    background: linear-gradient(90deg, #10b981, #06b6d4 50%, #8b5cf6) !important;
+    box-shadow: 0 0 10px rgba(6, 182, 212, 0.8);
+  }
+
+  /* 実況ログモニター（履歴） */
+  .log-monitor {
+    width: 100%;
+    background: #080c14;
+    border: 1px solid #1e293b;
+    border-radius: 10px;
+    height: 110px;
+    padding: 10px 16px;
+    overflow-y: auto;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+    color: #94a3b8;
+    display: flex;
+    flex-direction: column-reverse;
+  }
+
+  .log-line {
+    margin-bottom: 4px;
+    line-height: 1.4;
+  }
+  .log-event {
+    color: #f59e0b;
+    font-weight: bold;
+  }
+  .log-damage {
+    color: #ef4444;
+    font-weight: bold;
+  }
+  .log-buff {
+    color: #22c55e;
+    font-weight: bold;
+  }
+
+  /* カード本体 */
+  .card {
+    width: 310px;
+    height: 450px;
+    border-radius: 18px;
+    padding: 10px;
+    position: relative;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+    transition: transform 0.2s;
+    user-select: none;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* タイプ別外枠グラデーション */
+  .card-steel {
+    background: linear-gradient(135deg, #cbd5e1, #64748b 50%, #94a3b8);
+    border: 2px solid #e2e8f0;
+  }
+  .card-lightning {
+    background: linear-gradient(135deg, #fef08a, #ca8a04 50%, #eab308);
+    border: 2px solid #fef9c3;
+  }
+  .card-psychic {
+    background: linear-gradient(135deg, #f472b6, #9333ea 50%, #c084fc);
+    border: 2px solid #fbcfe8;
+  }
+  .card-water {
+    background: linear-gradient(135deg, #7dd3fc, #0284c7 50%, #38bdf8);
+    border: 2px solid #bae6fd;
+  }
+  .card-grass {
+    background: linear-gradient(135deg, #86efac, #16a34a 50%, #4ade80);
+    border: 2px solid #bbf7d0;
+  }
+  .card-fire {
+    background: linear-gradient(135deg, #fca5a5, #dc2626 50%, #f87171);
+    border: 2px solid #fecaca;
+  }
+
+  .card-inner {
+    background: #ffffff;
+    color: #0f172a;
+    border-radius: 12px;
+    height: 100%;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 3px;
+  }
+
+  .card-name {
+    font-size: 15.5px;
+    font-weight: 900;
+    color: #0f172a;
+  }
+
+  .card-code {
+    font-size: 11px;
+    color: #64748b;
+  }
+
+  .type-badge {
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 22px;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+  }
+  .type-steel { background: #64748b; }
+  .type-lightning { background: #eab308; }
+  .type-psychic { background: #a855f7; }
+  .type-water { background: #0284c7; }
+  .type-grass { background: #16a34a; }
+  .type-fire { background: #dc2626; }
+
+  .chart-window {
+    width: 100%;
+    height: 70px;
+    background: #0f172a;
+    border-radius: 6px;
+    border: 1px solid #cbd5e1;
+    margin: 4px 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .chart-header {
+    background: rgba(15, 23, 42, 0.85);
+    padding: 2px 8px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 9.5px;
+    color: #94a3b8;
+    font-weight: bold;
+  }
+
+  .chart-canvas {
+    width: 100%;
+    height: 48px;
+  }
+
+  /* 特性ボックス */
+  .ability-box {
+    background: #f1f5f9;
+    border-left: 4px solid #dc2626;
+    padding: 5px 8px;
+    border-radius: 4px;
+    margin-bottom: 5px;
+  }
+  .ability-title {
+    font-size: 12px;
+    font-weight: 900;
+    color: #dc2626;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 2px;
+  }
+  .ability-desc {
+    font-size: 10.5px;
+    color: #1e293b;
+    line-height: 1.35;
+    font-weight: 600;
+  }
+
+  /* ワザ欄 */
+  .attack-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .attack-item {
+    border-top: 1.5px solid #e2e8f0;
+    padding-top: 4px;
+  }
+  .attack-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .attack-name {
+    font-size: 13px;
+    font-weight: 900;
+    color: #0f172a;
+  }
+  .attack-damage {
+    font-size: 15.5px;
+    font-weight: 900;
+    color: #dc2626;
+  }
+  .attack-desc {
+    font-size: 10px;
+    color: #475569;
+    line-height: 1.25;
+    margin-top: 1px;
+  }
+
+  .card-footer {
+    border-top: 2px solid #e2e8f0;
+    padding-top: 4px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 9.5px;
+    color: #64748b;
+    font-weight: bold;
+  }
+
+  /* アニメーション */
+  .shake {
+    animation: shake-anim 0.35s ease-in-out;
+  }
+  @keyframes shake-anim {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-10px) rotate(-2deg); }
+    40%, 80% { transform: translateX(10px) rotate(2deg); }
+  }
+
+  .attack-lunge-left {
+    animation: lunge-right 0.35s ease-in-out;
+  }
+  @keyframes lunge-right {
+    50% { transform: translateX(35px) scale(1.05); }
+  }
+
+  .attack-lunge-right {
+    animation: lunge-left 0.35s ease-in-out;
+  }
+  @keyframes lunge-left {
+    50% { transform: translateX(-35px) scale(1.05); }
+  }
+
+  .defeated {
+    filter: grayscale(1) brightness(0.5);
+    transform: translateY(15px) rotate(5deg) !important;
+    transition: all 0.5s;
+  }
+
+  /* スマホ対応レスポンシブ（768px以下） */
+  @media (max-width: 768px) {
+    body { padding: 10px 8px; }
+    h1 { font-size: 20px; }
+    .matchup-bar { padding: 8px 10px; flex-direction: column; gap: 8px; }
+    .select-group { width: 100%; }
+    select { width: 100%; min-width: unset; font-size: 13px; }
+    .btn-random { width: 100%; }
+    .arena { padding: 10px 8px; }
+    .battle-stage { flex-direction: column-reverse; gap: 10px; }
+    .vs-badge { font-size: 22px; margin: -4px 0; }
+    .card { width: 100%; max-width: 330px; height: 380px; }
+    .hp-bar-container { width: 100%; max-width: 330px; }
+    .cutin-banner { min-height: 68px; padding: 6px 10px; }
+    .cutin-top { font-size: 17px; }
+    .cutin-bottom { font-size: 13.5px; }
+    .start-btn { width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>東証ポケカ：厳選60社決算バトルスタジアム</h1>
+  <p class="subtitle">朝刊ニュースで試合前から大波乱！ リアル連動型決算カードバトル</p>
+</header>
+
+<!-- 対戦マッチアップ選択バー -->
+<div class="matchup-bar">
+  <div class="select-group">
+    <label>▼ あなたの企業（PLAYER 1）</label>
+    <select id="p1Select" onchange="changeFighter('p1')"></select>
+  </div>
+
+  <button class="btn-random" onclick="pickRandomMatchup()">🎲 ランダム対戦</button>
+
+  <div class="select-group">
+    <label>▼ 対戦相手の企業（PLAYER 2）</label>
+    <select id="p2Select" onchange="changeFighter('p2')"></select>
+  </div>
+</div>
+
+<!-- バトルアリーナ -->
+<div class="arena">
+
+  <!-- 巨大必殺技カットインテロップ（技名＋ダメージ） -->
+  <div class="cutin-banner" id="cutinBanner">
+    <div class="cutin-top" id="cutinTop">🔔 企業を選んで「開戦！（朝刊ニュース直撃）」を押してください</div>
+    <div class="cutin-bottom" id="cutinBottom">開戦と同時に今朝のリアル経済ニュースが両社を直撃します</div>
+  </div>
+  
+  <!-- 操作コントロールパネル（オート／手動送り） -->
+  <div class="arena-controls">
+    <button class="start-btn" id="startBtn" onclick="startBattle()">
+      🔔 開戦！（朝刊ニュース直撃）
+    </button>
+
+    <!-- 手動送り＆オート切り替え（戦闘中のみ表示） -->
+    <button class="start-btn" id="nextTurnBtn" onclick="stepTurnManual()" style="display:none; background: linear-gradient(135deg, #2563eb, #1d4ed8); padding: 11px 28px; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);">
+      ⏭ 次のターンへ進む
+    </button>
+
+    <button class="ctrl-btn" id="autoToggleBtn" onclick="toggleAutoPlay()" style="display:none;">
+      ▶ オート進行: <span id="autoStatusText" style="color:#94a3b8;">OFF (手動)</span>
+    </button>
+
+    <button class="start-btn" id="resetBtn" style="background:#334155; display:none;" onclick="resetBattle()">
+      もう一度戦う
+    </button>
+  </div>
+
+  <div class="battle-stage">
+    
+    <!-- 左：プレイヤー企業 -->
+    <div class="fighter-slot">
+      <div class="hp-bar-container">
+        <div class="hp-bar-header">
+          <span id="p1-name-display">企業名</span>
+          <span id="p1-hp-text">HP -- / --</span>
+        </div>
+        <div class="hp-progress">
+          <div class="hp-fill" id="p1-hp-bar" style="width: 100%;"></div>
+        </div>
+      </div>
+      <div id="p1-card-slot"></div>
+    </div>
+
+    <!-- 中央：VS -->
+    <div class="vs-badge">VS</div>
+
+    <!-- 右：対戦相手企業 -->
+    <div class="fighter-slot">
+      <div class="hp-bar-container">
+        <div class="hp-bar-header">
+          <span id="p2-name-display">企業名</span>
+          <span id="p2-hp-text">HP -- / --</span>
+        </div>
+        <div class="hp-progress">
+          <div class="hp-fill" id="p2-hp-bar" style="width: 100%;"></div>
+        </div>
+      </div>
+      <div id="p2-card-slot"></div>
+    </div>
+
+  </div>
+
+  <!-- 実況モニター（履歴） -->
+  <div class="log-monitor" id="logMonitor">
+    <div class="log-line">🔔 バトルの詳細ログがここに蓄積されます。</div>
+  </div>
+
+</div>
+
+<script>
+// 今朝のリアル経済ニュースからAIが生成した市場イベント（朝刊20本＋場中20本、計40本）
+const TODAY_EVENTS = [
+  {
+    "id": "morning_01",
+    "timing": "MORNING",
+    "newsTitle": "為替1ドル155円突破 円安で輸出企業に追い風",
+    "category": "為替・マクロ経済",
+    "cutinTop": "💴 【歴史的円安】ドル円が155円台を突破！ 輸出企業が空前の追い風！",
+    "cutinBottom": "📈 トヨタ・任天堂・ソニーなどの輸出株に為替差益！ <span class=\"buff-highlight\">HP +140 上限突破</span>！！",
+    "targetScope": "SECTOR",
+    "targetSectors": [
+      "輸送用機器",
+      "電気機器",
+      "その他製品"
+    ],
+    "targetCodes": [
+      "7203",
+      "7267",
+      "6758",
+      "7974",
+      "6861"
+    ],
+    "effectType": "HEAL",
+    "value": 85,
+    "reason": "輸出採算が大幅に改善し、営業利益の上方修正期待が高まるため。"
+  },
+  {
+    "id": "morning_02",
+    "timing": "MORNING",
+    "newsTitle": "為替介入警戒で円高急進 輸入企業に恩恵",
+    "category": "為替・内需",
+    "cutinTop": "🇯🇵 【円高急反転】介入思惑で円急伸！ 輸入コスト低下で内需小売が沸騰！",
+    "cutinBottom": "🛋️ ニトリ・サイゼリヤ・業務スーパーの仕入れ採算急改善！ <span class=\"buff-highlight\">HP +120 上限突破</span>！！",
+    "targetScope": "SECTOR",
+    "targetSectors": [
+      "小売業"
+    ],
+    "targetCodes": [
+      "9843",
+      "7581",
+      "3038"
+    ],
+    "effectType": "HEAL",
+    "value": 70,
+    "reason": "輸入家具や食材の仕入れコストが急減し利益率が改善するため。"
+  },
+  {
+    "id": "morning_03",
+    "timing": "MORNING",
+    "newsTitle": "佐川急便 宅配便平均13%値上げへ EC・小売にコスト増",
+    "category": "物流・コスト高",
+    "cutinTop": "📦 【物流ショック】佐川急便が宅配運賃13%値上げを発表！！",
+    "cutinBottom": "💥 配送コスト激増！ メルカリ・ニトリ・ファストリなどの小売・ECに <span class=\"dmg-highlight\">55 dmg</span>！！",
+    "targetScope": "MULTI",
+    "targetSectors": [
+      "小売業",
+      "情報・通信"
+    ],
+    "targetCodes": [
+      "4385",
+      "9843",
+      "9983"
+    ],
+    "effectType": "DAMAGE",
+    "value": 55,
+    "reason": "物流2024年問題に伴う運送費上昇がEC・小売の営業利益を圧迫するため。"
+  },
+  {
+    "id": "morning_04",
+    "timing": "MORNING",
+    "newsTitle": "日銀が追加利上げ決定 メガバンク利ざや拡大",
+    "category": "金融政策・金利",
+    "cutinTop": "🏦 【日銀利上げ】長期金利が1.1%突破！ 預貸金利ざや拡大で銀行株が急騰！",
+    "cutinBottom": "⚔️ メガバンク（三菱UFJ・三井住友・みずほ）の攻撃力が <span class=\"buff-highlight\">1.5倍に覚醒</span>！！",
+    "targetScope": "SECTOR",
+    "targetSectors": [
+      "銀行業"
+    ],
+    "targetCodes": [
+      "8306",
+      "8316",
+      "8411"
+    ],
+    "effectType": "BUFF_ATK",
+    "value": 1.5,
+    "reason": "金利上昇により国内預貸金利ざやが拡大し、純金利収入が急増するため。"
+  },
+  {
+    "id": "morning_05",
+    "timing": "MORNING",
+    "newsTitle": "金利上昇ショック 先行投資型グロース株に売り殺到",
+    "category": "金利・グロース",
+    "cutinTop": "📉 【グロース急冷】金利上昇によるバリュエーション調整！ 先行投資株に逆風！",
+    "cutinBottom": "💥 アンジェス・ispace・楽天Gの有利子負債＆割引率が直撃！ <span class=\"dmg-highlight\">60 dmg</span>！！",
+    "targetScope": "MULTI",
+    "targetSectors": [
+      "医薬品",
+      "サービス業"
+    ],
+    "targetCodes": [
+      "4563",
+      "9348",
+      "4755"
+    ],
+    "effectType": "DAMAGE",
+    "value": 60,
+    "reason": "割引率の上昇と借入コスト増により、無配当・先行投資企業の現在価値が下落するため。"
+  },
+  {
+    "id": "morning_06",
+    "timing": "MORNING",
+    "newsTitle": "訪日観光客消費が過去最高の年間8兆円超へ",
+    "category": "観光・消費",
+    "cutinTop": "🗾 【インバウンド爆発】訪日外国人観光客の消費額が過去最高を更新！！",
+    "cutinBottom": "🏰 テーマパーク＆IPグッズ＆免税爆買い！ OLC・サンリオ・ドンキが <span class=\"buff-highlight\">HP +150 上限突破</span>！！",
+    "targetScope": "MULTI",
+    "targetSectors": [
+      "サービス業",
+      "小売業",
+      "卸売業"
+    ],
+    "targetCodes": [
+      "4661",
+      "8136",
+      "7532",
+      "3086"
+    ],
+    "effectType": "HEAL",
+    "value": 90,
+    "reason": "外国人観光客の旺盛な消費と円安効果が客単価を大幅に押し上げているため。"
+  },
+  {
+    "id": "morning_07",
+    "timing": "MORNING",
+    "newsTitle": "コメ・食用油など外食原材料価格が再高騰",
+    "category": "外食・インフレ",
+    "cutinTop": "🍚 【原材料インフレ】コメ不足と食材高騰！ 外食チェーンの原価率が悪化！",
+    "cutinBottom": "💥 すき家・スシロー・くら寿司・モスバーガーに原価ショック！ <span class=\"dmg-highlight\">50 dmg</span>！！",
+    "targetScope": "SECTOR",
+    "targetSectors": [
+      "小売業",
+      "食料品"
+    ],
+    "targetCodes": [
+      "7550",
+      "3563",
+      "2695",
+      "8153"
+    ],
+    "effectType": "DAMAGE",
+    "value": 50,
+    "reason": "コメ価格高騰や仕入れコスト上昇が、低価格外食チェーンの利益を削るため。"
+  },
+  {
+    "id": "morning_08",
+    "timing": "MORNING",
+    "newsTitle": "生成AIデータセンター新設ラッシュ 国内3兆円規模",
+    "category": "半導体・AIインフラ",
+    "cutinTop": "🤖 【AI狂乱相場】国内データセンター投資が3兆円規模へ急拡大！！",
+    "cutinBottom": "⚡ レーザーテック・東エレク・SBG・日立・NTTに巨額資金流入！ <span class=\"buff-highlight\">HP +160 上限突破</span>！！",
+    "targetScope": "MULTI",
+    "targetSectors": [
+      "電気機器",
+      "情報・通信"
+    ],
+    "targetCodes": [
+      "6920",
+      "8035",
+      "9984",
+      "6501",
+      "9432"
+    ],
+    "effectType": "HEAL",
+    "value": 95,
+    "reason": "AIサーバー、最先端半導体製造装置、光通信インフラへの需要が爆発したため。"
+  },
+  {
+    "id": "morning_09",
+    "timing": "MORNING",
+    "newsTitle": "紅海封鎖危機 欧州航路コンテナ運賃が急騰",
+    "category": "海運・市況",
+    "cutinTop": "🌊 【運賃バブル再燃】中東情勢の緊迫化で欧州航路コンテナ運賃が急騰！！",
+    "cutinBottom": "🚢 日本郵船のスポット利益が爆発！ 攻撃力が <span class=\"buff-highlight\">1.6倍に覚醒</span>！！",
+    "targetScope": "SECTOR",
+    "targetSectors": [
+      "海運業"
+    ],
+    "targetCodes": [
+      "9101"
+    ],
+    "effectType": "BUFF_ATK",
+    "value": 1.6,
+    "reason": "喜望峰迂回ルートによる運航日数増で船腹が逼迫し、スポット運賃が高騰するため。"
+  },
+  {
+    "id": "morning_10",
+    "timing": "MORNING",
+    "newsTitle": "燃油サーチャージ引き下げ 海外旅行需要が急回復",
+    "category": "空運・燃料",
+    "cutinTop": "✈️ 【燃油安でフライト急増】ジェット燃料価格安定で航空大手の採算が大幅改善！",
+    "cutinBottom": "🛫 ANA・JALの国際線旅客需要が満席！ <span class=\"buff-highlight\">HP +130 上限突破</span>！！",
+    "targetScope": "SECTOR",
+    "targetSectors": [
+      "空運業"
+    ],
+    "targetCodes": [
+      "9201",
+      "9202"
+    ],
+    "effectType": "HEAL",
+    "value": 80,
+    "reason": "燃料コスト低下とインバウンド・アウトバウンド双方の渡航需要回復のため。"
+  },
+  {
+    "id": "morning_11",
+    "timing": "MORNING",
+    "newsTitle": "東証 低PBR是正要請を継続 自社株買いラッシュ期待",
+    "category": "コーポレートガバナンス",
+    "cutinTop": "🏛️ 【東証改革プレッシャー】PBR1倍割れ企業へ資本効率改善の追加要請！",
+    "cutinBottom": "💰 日本製鉄・コマツ・メガバンク・三井不動産に株主還元期待！ <span class=\"buff-highlight\">HP +120 上限突破</span>！！",
+    "targetScope": "MULTI",
+    "targetSectors": [
+      "鉄鋼",
+      "機械",
+      "銀行業",
+      "不動産業"
+    ],
+    "targetCodes": [
+      "5401",
+      "6301",
+      "8306",
+      "8801"
+    ],
+    "effectType": "HEAL",
+    "value": 70,
+    "reason": "割安に放置された低PBR企業が大幅な増配や自社株買いを実施するとの期待。"
+  },
+  {
+    "id": "morning_12",
+    "timing": "MORNING",
+    "newsTitle": "中東情勢緊迫で原油高 総合商社の資源権益に追い風",
+    "category": "商社・エネルギー",
+    "cutinTop": "🛢️ 【原油高騰】地政学リスクで原油急反発！ 大手商社が資源高メリット享受！",
+    "cutinBottom": "💼 伊藤忠商事の資源トレード＆権益収益が急伸！ <span class=\"buff-highlight\">HP +110 上限突破</span>！！",
+    "targetScope": "SECTOR",
+    "targetSectors": [
+      "卸売業"
+    ],
+    "targetCodes": [
+      "8001"
+    ],
+    "effectType": "HEAL",
+    "value": 65,
+    "reason": "資源価格の上昇が大手総合商社の資源部門利益を底上げするため。"
+  },
+  {
+    "id": "morning_13",
+    "timing": "MORNING",
+    "newsTitle": "全国的な猛烈寒波襲来！ 防寒アパレルが完売続出",
+    "category": "気象・アパレル",
+    "cutinTop": "❄️ 【寒波特需】列島全域に極寒気団！ 防寒着・暖房グッズに客殺到！",
+    "cutinBottom": "🧥 ファストリ（ユニクロ）・イオン・スノーピークの冬物需要爆発！ <span class=\"buff-highlight\">HP +120 上限突破</span>！！",
+    "targetScope": "MULTI",
+    "targetSectors": [
+      "小売業",
+      "その他製品"
+    ],
+    "targetCodes": [
+      "9983",
+      "8267",
+      "7816"
+    ],
+    "effectType": "HEAL",
+    "value": 70,
+    "reason": "ヒートテックやダウンジャケット、高機能防寒具の需要が急増したため。"
+  },
+  {
+    "id": "morning_16",
+    "timing": "MORNING",
+    "newsTitle": "メガファーマの抗がん剤 国際治験で主要評価項目を達成",
+    "category": "バイオ・新薬",
+    "cutinTop": "💊 【新薬開発大成功】中外製薬・武田薬品の抗体医薬治験がポジティブ結果発表！",
+    "cutinBottom": "🧬 グローバル展開とロイヤルティ期待で <span class=\"buff-highlight\">HP +150 上限突破</span>！！",
+    "targetScope": "SECTOR",
+    "targetSectors": [
+      "医薬品"
+    ],
+    "targetCodes": [
+      "4519",
+      "4502"
+    ],
+    "effectType": "HEAL",
+    "value": 90,
+    "reason": "画期的な新薬候補が臨床第3相試験をクリアし、将来の巨額ブロックバスター化が見込めるため。"
+  },
+  {
+    "id": "morning_17",
+    "timing": "MORNING",
+    "newsTitle": "訪日パス値上げ後も新幹線利用絶好調 運輸収入が回復",
+    "category": "鉄道・インバウンド",
+    "cutinTop": "🚅 【新幹線満席ラッシュ】訪日客パス大幅値上げ後も旺盛な旅行需要が継続！",
+    "cutinBottom": "🎫 JR東日本の鉄道運輸収入が急回復！ <span class=\"buff-highlight\">HP +120 上限突破</span>！！",
+    "targetScope": "SECTOR",
+    "targetSectors": [
+      "陸運業"
+    ],
+    "targetCodes": [
+      "9020"
+    ],
+    "effectType": "HEAL",
+    "value": 70,
+    "reason": "外国人旅行者向け乗り放題パスの値上げ浸透と国内観光需要の高止まりによる増収。"
+  },
+  {
+    "id": "morning_18",
+    "timing": "MORNING",
+    "newsTitle": "スガキヤがドムドムハンバーガーを子会社化 外食連携",
+    "category": "外食・M&A",
+    "cutinTop": "🍔 【電撃M&A】スガキヤが「ドムドムハンバーガー」を子会社化！！",
+    "cutinBottom": "💖 愛知・喫茶カルチャー×レトロバーガーの共闘！ コメダ・JTが <span class=\"buff-highlight\">HP +110 上限突破</span>！！",
+    "targetScope": "MULTI",
+    "targetSectors": [
+      "小売業",
+      "食料品"
+    ],
+    "targetCodes": [
+      "3543",
+      "2914"
+    ],
+    "effectType": "HEAL",
+    "value": 65,
+    "reason": "老舗飲食ブランド同士のコラボと話題性が外食・嗜好品セクターの業績を押し上げるため。"
+  },
+  {
+    "id": "both_14",
+    "timing": "BOTH",
+    "newsTitle": "防衛省 次年度防衛予算8兆円超を概算要求",
+    "category": "防衛・国策",
+    "cutinTop": "🚀 【国防費拡大】防衛予算が過去最大8兆円規模へ！ 装備品受注が集中！",
+    "cutinBottom": "🛡️ 三菱重工業の攻撃力が一時的に <span class=\"buff-highlight\">1.7倍に覚醒</span>！！",
+    "targetScope": "COMPANY",
+    "targetSectors": [
+      "機械"
+    ],
+    "targetCodes": [
+      "7011"
+    ],
+    "effectType": "BUFF_ATK",
+    "value": 1.7,
+    "reason": "長射程ミサイル開発や防衛装備品の調達増が三菱重工の業績を長期牽引するため。"
+  },
+  {
+    "id": "both_15",
+    "timing": "BOTH",
+    "newsTitle": "中国消費減速 日系高級化粧品の現地販売が低迷",
+    "category": "化粧品・中国市場",
+    "cutinTop": "💄 【中国市場冷え込み】現地の消費減速と現地品シフトで苦戦！",
+    "cutinBottom": "💥 資生堂のインバウンド・中国免税売上が減速！ <span class=\"dmg-highlight\">65 dmg</span>！！",
+    "targetScope": "COMPANY",
+    "targetSectors": [
+      "化学"
+    ],
+    "targetCodes": [
+      "4911"
+    ],
+    "effectType": "DAMAGE",
+    "value": 65,
+    "reason": "中国景気の停滞と現地コスメ台頭により、プレステージ化粧品の販売が落ち込むため。"
+  },
+  {
+    "id": "both_19",
+    "timing": "BOTH",
+    "newsTitle": "世界的な銅・鉱山需要急増 建機・資源開発が活況",
+    "category": "建機・鉱山開発",
+    "cutinTop": "🚜 【鉱山機械フル稼働】脱炭素・電化に伴う世界的な銅鉱山開発ブーム！",
+    "cutinBottom": "⚡ コマツの大型ダンプ・無人建機が世界で受注残高急増！ <span class=\"buff-highlight\">HP +130 上限突破</span>！！",
+    "targetScope": "COMPANY",
+    "targetSectors": [
+      "機械"
+    ],
+    "targetCodes": [
+      "6301"
+    ],
+    "effectType": "HEAL",
+    "value": 80,
+    "reason": "脱炭素社会で不可欠な銅やレアメタルの採掘が活発化し、鉱山機械の需要が急増。"
+  },
+  {
+    "id": "both_20",
+    "timing": "BOTH",
+    "newsTitle": "バイオCDMO受託製造が好調 医療・電子材料の複合化",
+    "category": "バイオ・電子材料",
+    "cutinTop": "🧪 【バイオ受託製造拡大】抗体医薬の大型受託が順調に進捗！",
+    "cutinBottom": "✨ 富士フイルムHDのヘルスケア・半導体材料部門が好調！ <span class=\"buff-highlight\">HP +130 上限突破</span>！！",
+    "targetScope": "COMPANY",
+    "targetSectors": [
+      "化学"
+    ],
+    "targetCodes": [
+      "4901"
+    ],
+    "effectType": "HEAL",
+    "value": 80,
+    "reason": "バイオ医薬品製造受託（CDMO）および最先端半導体プロセスケミカルの販売が伸長。"
+  },
+  {
+    "id": "intraday_01",
+    "timing": "INTRADAY",
+    "newsTitle": "日銀植田総裁の会見がタカ派的と判断 金利急騰",
+    "category": "金融政策・速報",
+    "cutinTop": "📢 【場中速報】日銀植田総裁会見「追加利上げを排除せず」！",
+    "cutinBottom": "🏦 金融株にマネー集中！ メガバンクの攻撃力が <span class=\"buff-highlight\">1.5倍に急上昇</span>！！",
+    "targetScope": "SECTOR",
+    "targetSectors": [
+      "銀行業"
+    ],
+    "targetCodes": [
+      "8306",
+      "8316",
+      "8411"
+    ],
+    "effectType": "BUFF_ATK",
+    "value": 1.5,
+    "reason": "総裁発言により利上げピッチが早まるとの観測が広がり、銀行株が一斉に買われたため。"
+  },
+  {
+    "id": "intraday_02",
+    "timing": "INTRADAY",
+    "newsTitle": "政府・日銀による覆面為替介入か ドル円が急落",
+    "category": "為替・速報",
+    "cutinTop": "🚨 【場中急変】ドル円が1分間で3円急落！ 輸出株に売り注文殺到！",
+    "cutinBottom": "💥 急激な円高ショック！ トヨタ・ホンダ・日産・ソニーに <span class=\"dmg-highlight\">65 dmg</span>！！",
+    "targetScope": "SECTOR",
+    "targetSectors": [
+      "輸送用機器",
+      "電気機器"
+    ],
+    "targetCodes": [
+      "7201",
+      "7203",
+      "7267",
+      "6758"
+    ],
+    "effectType": "DAMAGE",
+    "value": 65,
+    "reason": "突発的な円高進行により、輸出企業の通期想定為替レート割れと減益リスクが意識されたため。"
+  },
+  {
+    "id": "intraday_03",
+    "timing": "INTRADAY",
+    "newsTitle": "任天堂 次世代機「Switch 2」の公式映像を緊急公開！",
+    "category": "ゲーム・IP",
+    "cutinTop": "🎮 【メガトン級速報】任天堂が次世代ハードの公式映像をサプライズ公開！！",
+    "cutinBottom": "✨ 全世界のゲーマー熱狂！ 任天堂・スクエニ・カプコン・バンナムが <span class=\"buff-highlight\">HP +180 上限突破</span>！！",
+    "targetScope": "MULTI",
+    "targetSectors": [
+      "その他製品",
+      "情報・通信"
+    ],
+    "targetCodes": [
+      "7974",
+      "9684",
+      "9697",
+      "7832"
+    ],
+    "effectType": "HEAL",
+    "value": 110,
+    "reason": "全世界待望の新ハード発表により、ゲームプラットフォームおよびサードパーティ各社の業績期待が沸騰。"
+  },
+  {
+    "id": "intraday_04",
+    "timing": "INTRADAY",
+    "newsTitle": "米エヌビディアが超絶決算 半導体関連株に買い殺到",
+    "category": "半導体・速報",
+    "cutinTop": "💻 【AI半導体狂騒】米NVIDIAの売上高が市場予想を大幅超過！",
+    "cutinBottom": "⚡ レーザーテック・東京エレクトロン・ルネサスが <span class=\"buff-highlight\">HP +170 上限突破</span>！！",
+    "targetScope": "SECTOR",
+    "targetSectors": [
+      "電気機器"
+    ],
+    "targetCodes": [
+      "6920",
+      "8035",
+      "6723"
+    ],
+    "effectType": "HEAL",
+    "value": 100,
+    "reason": "AI半導体への旺盛な需要が持続していることが証明され、製造装置メーカーに買いが殺到。"
+  },
+  {
+    "id": "intraday_05",
+    "timing": "INTRADAY",
+    "newsTitle": "英アームが過去最高益を更新 ソフトバンクGの保有資産急拡大",
+    "category": "テクノロジー・投資",
+    "cutinTop": "🧠 【ARM無双】傘下の英アーム株が急騰！ AIスマホ向けライセンス料が急増！",
+    "cutinBottom": "🚀 ソフトバンクグループの時価資産膨張！ 攻撃力が <span class=\"buff-highlight\">1.6倍に覚醒</span>！！",
+    "targetScope": "COMPANY",
+    "targetSectors": [
+      "情報・通信"
+    ],
+    "targetCodes": [
+      "9984"
+    ],
+    "effectType": "BUFF_ATK",
+    "value": 1.6,
+    "reason": "傘下企業の株価急騰により、SBGの保有株式価値（NAV）が劇的に向上したため。"
+  },
+  {
+    "id": "intraday_06",
+    "timing": "INTRADAY",
+    "newsTitle": "気象庁が猛暑警報 ビール・飲料の消費量が前年比150%超",
+    "category": "飲料・天候速報",
+    "cutinTop": "☀️ 【列島猛暑速報】最高気温40度迫る！ 飲料各社の工場がフル稼働！",
+    "cutinBottom": "🍺 アサヒ（スーパードライ）・キリンのビール出荷が爆発！ <span class=\"buff-highlight\">HP +130 上限突破</span>！！",
+    "targetScope": "SECTOR",
+    "targetSectors": [
+      "食料品"
+    ],
+    "targetCodes": [
+      "2502",
+      "2503"
+    ],
+    "effectType": "HEAL",
+    "value": 80,
+    "reason": "記録的猛暑により、外食・家庭用双方でビール類や清涼飲料の需要が急拡大したため。"
+  },
+  {
+    "id": "intraday_07",
+    "timing": "INTRADAY",
+    "newsTitle": "米中ハイテク摩擦激化 先端半導体製造装置の規制強化報道",
+    "category": "地政学・半導体",
+    "cutinTop": "⚠️ 【規制ショック】対中半導体規制の追加報道で市場が警戒！",
+    "cutinBottom": "💥 東京エレクトロン・レーザーテック・ニデックに嫌気売り！ <span class=\"dmg-highlight\">70 dmg</span>！！",
+    "targetScope": "SECTOR",
+    "targetSectors": [
+      "電気機器"
+    ],
+    "targetCodes": [
+      "8035",
+      "6920",
+      "6594"
+    ],
+    "effectType": "DAMAGE",
+    "value": 70,
+    "reason": "主要市場である中国向け販売への制限が懸念され、製造装置メーカーが売られたため。"
+  },
+  {
+    "id": "intraday_08",
+    "timing": "INTRADAY",
+    "newsTitle": "ispaceの月面着陸船が最終降下態勢入りと公式発表",
+    "category": "宇宙開発・速報",
+    "cutinTop": "🌕 【月面着陸カウントダウン】ispaceのランダーが月周回軌道から降下開始！",
+    "cutinBottom": "🛸 成功なら時価総額倍増のロマン！ 攻撃力が <span class=\"buff-highlight\">2.0倍に急上昇</span>！！",
+    "targetScope": "COMPANY",
+    "targetSectors": [
+      "サービス業"
+    ],
+    "targetCodes": [
+      "9348"
+    ],
+    "effectType": "BUFF_ATK",
+    "value": 2.0,
+    "reason": "民間初の月面着陸成功への期待が高まり、熱狂的な投機買いが集中したため。"
+  },
+  {
+    "id": "intraday_09",
+    "timing": "INTRADAY",
+    "newsTitle": "新興バイオ企業が開発パイプラインの治験未達を開示",
+    "category": "バイオ・失望売り",
+    "cutinTop": "📉 【治験ショック】開発中新薬の主要評価項目で優位性示せず！",
+    "cutinBottom": "💥 アンジェスに失望のストップ安気配売り！ <span class=\"dmg-highlight\">70 dmg</span>！！",
+    "targetScope": "COMPANY",
+    "targetSectors": [
+      "医薬品"
+    ],
+    "targetCodes": [
+      "4563"
+    ],
+    "effectType": "DAMAGE",
+    "value": 70,
+    "reason": "大型新薬候補の臨床試験失敗により、将来の収益化シナリオが白紙化されたため。"
+  },
+  {
+    "id": "intraday_10",
+    "timing": "INTRADAY",
+    "newsTitle": "メルカリ 米国事業が通期で黒字転換達成と速報",
+    "category": "EC・決算速報",
+    "cutinTop": "📦 【悲願の黒字化】メルカリ米国事業がコスト改革で黒字転換！",
+    "cutinBottom": "📈 海外赤字の重荷が解消！ メルカリが <span class=\"buff-highlight\">HP +140 上限突破</span>！！",
+    "targetScope": "COMPANY",
+    "targetSectors": [
+      "情報・通信"
+    ],
+    "targetCodes": [
+      "4385"
+    ],
+    "effectType": "HEAL",
+    "value": 85,
+    "reason": "創業以来の課題だった海外事業が利益貢献フェーズに入ったサプライズ。"
+  },
+  {
+    "id": "intraday_11",
+    "timing": "INTRADAY",
+    "newsTitle": "トヨタ 全固体電池の量産実用化計画を前倒し発表！",
+    "category": "自動車・EV革新",
+    "cutinTop": "🚗 【ゲームチェンジャー】トヨタが全固体電池の量産前倒しを電撃発表！",
+    "cutinBottom": "⚡ 航続1000km＆超急速充電！ トヨタの攻撃力が <span class=\"buff-highlight\">1.5倍に覚醒</span>！！",
+    "targetScope": "COMPANY",
+    "targetSectors": [
+      "輸送用機器"
+    ],
+    "targetCodes": [
+      "7203"
+    ],
+    "effectType": "BUFF_ATK",
+    "value": 1.5,
+    "reason": "次世代EV電池の覇権争いにおいて圧倒的な技術的優位性をアピールしたため。"
+  },
+  {
+    "id": "intraday_12",
+    "timing": "INTRADAY",
+    "newsTitle": "サイゼリヤ 値上げゼロのまま客数激増で過去最高益！",
+    "category": "外食・神経営",
+    "cutinTop": "🍝 【最強コスパの勝利】サイゼリヤが価格据え置きで爆発的客数を記録！",
+    "cutinBottom": "💖 徹底的な効率化で過去最高純益！ <span class=\"buff-highlight\">HP +150 上限突破</span>！！",
+    "targetScope": "COMPANY",
+    "targetSectors": [
+      "小売業"
+    ],
+    "targetCodes": [
+      "7581"
+    ],
+    "effectType": "HEAL",
+    "value": 90,
+    "reason": "値上げラッシュの外食業界において、徹底した業務改善とコスパで客足を総取りしたため。"
+  },
+  {
+    "id": "intraday_13",
+    "timing": "INTRADAY",
+    "newsTitle": "サンリオ 世界的IPコラボで海外ロイヤルティ収入爆発",
+    "category": "IPビジネス・世界市場",
+    "cutinTop": "🎀 【世界的大ブーム】ハローキティ生誕企画が海外で完売連発！",
+    "cutinBottom": "✨ 海外ライセンスの高利益率が炸裂！ サンリオが <span class=\"buff-highlight\">HP +140 上限突破</span>！！",
+    "targetScope": "COMPANY",
+    "targetSectors": [
+      "卸売業"
+    ],
+    "targetCodes": [
+      "8136"
+    ],
+    "effectType": "HEAL",
+    "value": 85,
+    "reason": "欧米・アジアでのキャラクターIP展開が成功し、原価のかからないロイヤルティ収入が急伸。"
+  },
+  {
+    "id": "intraday_14",
+    "timing": "INTRADAY",
+    "newsTitle": "東宝配給の新作アニメ映画が興収100億円ペースの社会現象！",
+    "category": "映画・エンタメ",
+    "cutinTop": "🎬 【メガヒット誕生】東宝配給の新作アニメ映画が初週から満席連発！！",
+    "cutinBottom": "🦁 映画館＆配給手数料が天井知らず！ 東宝が <span class=\"buff-highlight\">HP +130 上限突破</span>！！",
+    "targetScope": "COMPANY",
+    "targetSectors": [
+      "サービス業"
+    ],
+    "targetCodes": [
+      "9602"
+    ],
+    "effectType": "HEAL",
+    "value": 80,
+    "reason": "空前の興行収入により、配給収入とTOHOシネマズのチケット・飲食売上が急拡大。"
+  },
+  {
+    "id": "intraday_15",
+    "timing": "INTRADAY",
+    "newsTitle": "楽天モバイル 契約数800万回線突破で単月黒字化視野",
+    "category": "通信・黒字化サプライズ",
+    "cutinTop": "📶 【悲願の黒字化前進】楽天モバイル契約数が急増！ グループの財務改善！",
+    "cutinBottom": "📈 最悪期脱出のサプライズ！ 楽天グループが <span class=\"buff-highlight\">HP +150 上限突破</span>！！",
+    "targetScope": "COMPANY",
+    "targetSectors": [
+      "サービス業"
+    ],
+    "targetCodes": [
+      "4755"
+    ],
+    "effectType": "HEAL",
+    "value": 90,
+    "reason": "プラチナバンド稼働と契約増により巨額赤字が急ピッチで縮小したため。"
+  },
+  {
+    "id": "intraday_16",
+    "timing": "INTRADAY",
+    "newsTitle": "日本製鉄 EV向け超高機能電磁鋼板の大規模増産決定",
+    "category": "鉄鋼・次世代素材",
+    "cutinTop": "⚙️ 【高付加価値鋼で独走】日本製鉄がEVモーター用電磁鋼板の増産を発表！",
+    "cutinBottom": "🛡️ 世界最強の脱炭素特殊鋼！ 攻撃力が <span class=\"buff-highlight\">1.4倍に覚醒</span>！！",
+    "targetScope": "COMPANY",
+    "targetSectors": [
+      "鉄鋼"
+    ],
+    "targetCodes": [
+      "5401"
+    ],
+    "effectType": "BUFF_ATK",
+    "value": 1.4,
+    "reason": "模倣が困難なハイエンド特殊鋼の独占的シェアにより高収益体制が強固になったため。"
+  },
+  {
+    "id": "intraday_17",
+    "timing": "INTRADAY",
+    "newsTitle": "都心オフィス空室率が2%台へ低下 賃料引き上げ成功",
+    "category": "不動産・再開発",
+    "cutinTop": "🏢 【都心オフィス特需】東京主要5区のオフィス空室率が歴史的低水準へ！",
+    "cutinBottom": "🏙️ 日本橋・八重洲の再開発利益が急拡大！ 三井不動産が <span class=\"buff-highlight\">HP +120 上限突破</span>！！",
+    "targetScope": "COMPANY",
+    "targetSectors": [
+      "不動産業"
+    ],
+    "targetCodes": [
+      "8801"
+    ],
+    "effectType": "HEAL",
+    "value": 70,
+    "reason": "出社回帰とハイグレードビル需要の集中により、都心オフィス賃料の上昇が継続。"
+  },
+  {
+    "id": "intraday_18",
+    "timing": "INTRADAY",
+    "newsTitle": "原油先物急落！ ジェット燃料・電力コスト減で空運・鉄道が急伸",
+    "category": "空運・陸運・エネルギー安",
+    "cutinTop": "🛢️ 【原油急落恩恵】燃料コスト激減！ 空運・鉄道各社の利益が急改善！",
+    "cutinBottom": "✈️ ANA・JAL・JR東日本の営業利益見通し急浮上！ <span class=\"buff-highlight\">HP +130 上限突破</span>！！",
+    "targetScope": "MULTI",
+    "targetSectors": [
+      "空運業",
+      "陸運業"
+    ],
+    "targetCodes": [
+      "9201",
+      "9202",
+      "9020"
+    ],
+    "effectType": "HEAL",
+    "value": 80,
+    "reason": "原油価格の急落により、航空燃料サーチャージ負担軽減と鉄道の動力費削減が進むため。"
+  },
+  {
+    "id": "intraday_19",
+    "timing": "INTRADAY",
+    "newsTitle": "欧州向けコンテナ船の満杯継続 日本郵船が通期予想上方修正",
+    "category": "海運・業績上方修正",
+    "cutinTop": "🚢 【海運バブル再燃】欧州向けスポット運賃高止まりで業績上方修正！",
+    "cutinBottom": "🌊 日本郵船の当期純利益が上振れ！ 攻撃力が <span class=\"buff-highlight\">1.5倍に覚醒</span>！！",
+    "targetScope": "COMPANY",
+    "targetSectors": [
+      "海運業"
+    ],
+    "targetCodes": [
+      "9101"
+    ],
+    "effectType": "BUFF_ATK",
+    "value": 1.5,
+    "reason": "喜望峰迂回に伴うコンテナ船市況の高騰が長期化し、海運大手の通期利益が予想を超過。"
+  },
+  {
+    "id": "intraday_20",
+    "timing": "INTRADAY",
+    "newsTitle": "日経平均先物が突如500円急騰！ 海外勢のリスクオン買い",
+    "category": "マクロ全体・全面高",
+    "cutinTop": "🌏 【市場全面高】日経平均先物が急騰！ 海外ファンドの一斉買いが入る！",
+    "cutinBottom": "🚀 地合い好転の追い風！ 対戦両社の株価心理が好転し <span class=\"buff-highlight\">HP +100 上限突破</span>！！",
+    "targetScope": "ALL",
+    "targetSectors": [],
+    "targetCodes": [],
+    "effectType": "HEAL",
+    "value": 60,
+    "reason": "海外短期筋による株価指数先物の買い戻しが主導し、東証全銘柄にリスクオンの買いが波及したため。"
+  }
+];
+
+// 厳選60社のデータ定義（企業名五十音順・快適テンポHP 460〜1,280正規化済み）
+const CARDS_DATA = [
+  {
+    "code": "9348",
+    "name": "ispace (アイスペース)",
+    "sector": "サービス業",
+    "type": "超",
+    "badgeClass": "type-psychic",
+    "hp": 480,
+    "maxHp": 480,
+    "pbr": 8.5,
+    "per": 0,
+    "divYield": 0,
+    "ability": {
+      "name": "月面ランダーHAKUTO-R",
+      "icon": "🌕",
+      "desc": "成功率30%で時価総額3倍。失敗すると自分に80自傷ダメージ。"
+    },
+    "attack1": {
+      "name": "NASAペイロード輸送契約",
+      "dmg": 60,
+      "desc": "民間月面探査プログラムの夢を語る。"
+    },
+    "attack2": {
+      "name": "月面着陸タッチダウン！",
+      "dmg": 999,
+      "desc": "成功確率30%。成功すればどんな相手も一撃で即死させる。"
+    },
+    "cardClass": "card-psychic",
+    "kana": "あいすぺーす",
+    "equity": 0.015
+  },
+  {
+    "code": "2502",
+    "name": "アサヒグループホールディングス",
+    "sector": "食料品",
+    "type": "水",
+    "badgeClass": "type-water",
+    "cardClass": "card-water",
+    "hp": 860,
+    "maxHp": 860,
+    "pbr": 1.3,
+    "per": 16,
+    "divYield": 2.8,
+    "ability": {
+      "name": "生ジョッキ缶・泡立ち装甲",
+      "icon": "🍺",
+      "desc": "フタを開けると泡が噴出。受けるダメージを常に「25」軽減する。"
+    },
+    "attack1": {
+      "name": "辛口スーパードライ喉越し",
+      "dmg": 100,
+      "desc": "研ぎ澄まされたキレ味で相手の隙を突く電撃ストローク。"
+    },
+    "attack2": {
+      "name": "欧州名門ビール買収爆撃",
+      "dmg": 220,
+      "desc": "ピルスナーウルケルなど世界的ブランド群による札束爆撃。"
+    },
+    "kana": "あさひぐるーぷほーるでぃんぐす",
+    "equity": 2.3
+  },
+  {
+    "code": "4563",
+    "name": "アンジェス",
+    "sector": "医薬品",
+    "type": "超",
+    "badgeClass": "type-psychic",
+    "hp": 460,
+    "maxHp": 460,
+    "pbr": 1.2,
+    "per": 0,
+    "divYield": 0,
+    "ability": {
+      "name": "無限ワラント増資",
+      "icon": "💸",
+      "desc": "毎ターン自分のHPが10減少（希薄化）する。"
+    },
+    "attack1": {
+      "name": "治験データIR速報",
+      "dmg": 50,
+      "desc": "サイコロを振って1が出たら治験失敗で即死。"
+    },
+    "attack2": {
+      "name": "奇跡のテンバガー",
+      "dmg": 9999,
+      "desc": "成功確率5%。相手がどんな大企業でも一発でゲームセットにする。"
+    },
+    "cardClass": "card-psychic",
+    "kana": "あんじぇす",
+    "equity": 0.01
+  },
+  {
+    "code": "8267",
+    "name": "イオン",
+    "sector": "小売業",
+    "type": "草",
+    "badgeClass": "type-grass",
+    "cardClass": "card-grass",
+    "hp": 800,
+    "maxHp": 800,
+    "pbr": 3.2,
+    "per": 40,
+    "divYield": 1,
+    "ability": {
+      "name": "火曜市・主婦の突撃陣",
+      "icon": "🛒",
+      "desc": "全国巨大モール網。相手から受けるダメージを常に「30」軽減する。"
+    },
+    "attack1": {
+      "name": "トップバリュ価格破壊プレス",
+      "dmg": 100,
+      "desc": "圧倒的なPBプライベートブランドによるコスパ圧殺。"
+    },
+    "attack2": {
+      "name": "巨大イオンモール迷宮送り",
+      "dmg": 210,
+      "desc": "一日中歩いても端に着かない広大さで相手を疲弊させる。"
+    },
+    "kana": "いおん",
+    "equity": 1.5
+  },
+  {
+    "code": "8001",
+    "name": "伊藤忠商事",
+    "sector": "卸売業",
+    "type": "炎",
+    "badgeClass": "type-fire",
+    "hp": 1050,
+    "maxHp": 1050,
+    "pbr": 1.8,
+    "per": 10.9,
+    "divYield": 3.2,
+    "ability": {
+      "name": "朝型勤務・野武士集団",
+      "icon": "☀️",
+      "desc": "毎朝必ず先制攻撃（先手）を取ることができる。"
+    },
+    "attack1": {
+      "name": "ファミマ店頭シナジー",
+      "dmg": 95,
+      "desc": "川上から川下まで生活消費を押さえる連撃。"
+    },
+    "attack2": {
+      "name": "非資源ナンバーワン強襲",
+      "dmg": 200,
+      "desc": "資源価格に左右されない繊維・食料の底力。"
+    },
+    "cardClass": "card-fire",
+    "kana": "いとうちゅうしょうじ",
+    "equity": 6.2
+  },
+  {
+    "code": "9202",
+    "name": "ANAホールディングス",
+    "sector": "空運業",
+    "type": "炎",
+    "badgeClass": "type-fire",
+    "hp": 750,
+    "maxHp": 750,
+    "pbr": 1.4,
+    "per": 8.5,
+    "divYield": 2.5,
+    "ability": {
+      "name": "サーチャージ燃料転嫁",
+      "icon": "✈️",
+      "desc": "原油価格が高騰しても、運賃に上乗せしてダメージを肩代わり。"
+    },
+    "attack1": {
+      "name": "インバウンド満席フライト",
+      "dmg": 90,
+      "desc": "訪日外国人観光客によるドル箱路線ラッシュ。"
+    },
+    "attack2": {
+      "name": "ボーイング787超音速ダイブ",
+      "dmg": 180,
+      "desc": "成田・羽田の国際ハブから急降下爆撃。"
+    },
+    "cardClass": "card-fire",
+    "kana": "えーえぬえーほーるでぃんぐす",
+    "equity": 1.0
+  },
+  {
+    "code": "4661",
+    "name": "オリエンタルランド",
+    "sector": "サービス業",
+    "type": "超",
+    "badgeClass": "type-psychic",
+    "hp": 750,
+    "maxHp": 750,
+    "pbr": 4.8,
+    "per": 42.1,
+    "divYield": 0.6,
+    "ability": {
+      "name": "夢と魔法の絶対結界",
+      "icon": "✨",
+      "desc": "顧客満足度MAX。相手のクリティカルヒット（会心の一撃）を完全に防ぐ。"
+    },
+    "attack1": {
+      "name": "新テーマポート開業",
+      "dmg": 120,
+      "desc": "圧倒的な没入感で相手の戦意を奪う。"
+    },
+    "attack2": {
+      "name": "変動価格チケット値上げ",
+      "dmg": 200,
+      "desc": "インフレ追従の容赦なき価格改定アタック。"
+    },
+    "cardClass": "card-psychic",
+    "kana": "おりえんたるらんど",
+    "equity": 1.0
+  },
+  {
+    "code": "9697",
+    "name": "カプコン",
+    "sector": "情報・通信",
+    "type": "雷",
+    "badgeClass": "type-lightning",
+    "hp": 630,
+    "maxHp": 630,
+    "pbr": 7.4,
+    "per": 28.5,
+    "divYield": 1.7,
+    "ability": {
+      "name": "PCデジタル販売比率80%",
+      "icon": "🐉",
+      "desc": "Steamセールで世界中で売れ続ける。利益率50%超の無双体制。"
+    },
+    "attack1": {
+      "name": "モンスターハンター大剣溜め斬り",
+      "dmg": 130,
+      "desc": "咆哮をかいくぐり弱点に叩き込む特大一撃。"
+    },
+    "attack2": {
+      "name": "バイオハザードREエンジン連打",
+      "dmg": 220,
+      "desc": "美麗な自社エンジンによるゾンビ感染パニック。"
+    },
+    "cardClass": "card-lightning",
+    "kana": "かぷこん",
+    "equity": 0.2
+  },
+  {
+    "code": "2503",
+    "name": "キリンホールディングス",
+    "sector": "食料品",
+    "type": "草",
+    "badgeClass": "type-grass",
+    "cardClass": "card-grass",
+    "hp": 800,
+    "maxHp": 800,
+    "pbr": 1.7,
+    "per": 15,
+    "divYield": 3.4,
+    "ability": {
+      "name": "プラズマ乳酸菌免疫バフ",
+      "icon": "🧬",
+      "desc": "健康な人の免疫機能維持。受けるダメージを常に15%カット。"
+    },
+    "attack1": {
+      "name": "一番搾り麦汁アタック",
+      "dmg": 95,
+      "desc": "贅沢な一番搾り麦汁だけを使った濃厚な打撃。"
+    },
+    "attack2": {
+      "name": "ファンケル・協和キリン複合砲",
+      "dmg": 210,
+      "desc": "ビールから医薬品・ヘルスケアへ多角化したハイブリッド一撃。"
+    },
+    "kana": "きりんほーるでぃんぐす",
+    "equity": 1.4
+  },
+  {
+    "code": "6861",
+    "name": "キーエンス",
+    "sector": "電気機器",
+    "type": "鋼",
+    "badgeClass": "type-steel",
+    "hp": 900,
+    "maxHp": 900,
+    "pbr": 5.2,
+    "per": 35,
+    "divYield": 0.6,
+    "ability": {
+      "name": "営業利益率50%のバケモノ",
+      "icon": "💎",
+      "desc": "ファブレス経営。相手に与えたダメージの30%分、自分のHPを回復する。"
+    },
+    "attack1": {
+      "name": "当日即日出荷プレス",
+      "dmg": 115,
+      "desc": "直販営業マンの鬼電と超速納品による連打。"
+    },
+    "attack2": {
+      "name": "平均年収2200万パンチ",
+      "dmg": 230,
+      "desc": "日本の最高峰エリート軍団による圧倒的破壊力。"
+    },
+    "cardClass": "card-steel",
+    "kana": "きーえんす",
+    "equity": 2.8
+  },
+  {
+    "code": "2695",
+    "name": "くら寿司",
+    "sector": "小売業",
+    "type": "水",
+    "badgeClass": "type-water",
+    "cardClass": "card-water",
+    "hp": 530,
+    "maxHp": 530,
+    "pbr": 2.1,
+    "per": 35,
+    "divYield": 0.6,
+    "ability": {
+      "name": "抗菌寿司カバー鮮度くん",
+      "icon": "🛡️",
+      "desc": "ウイルス・異物を完全遮断。相手からのデバフを無効化する。"
+    },
+    "attack1": {
+      "name": "ビッくらポン！大当たり",
+      "dmg": 110,
+      "desc": "5皿投入で抽選開始。人気アニメコラボ景品が飛び出す。"
+    },
+    "attack2": {
+      "name": "全自動皿回収プレス",
+      "dmg": 200,
+      "desc": "テーブル回収口へ吸い込まれるような超速圧殺アタック。"
+    },
+    "kana": "くらずし",
+    "equity": 0.045
+  },
+  {
+    "code": "9433",
+    "name": "KDDI",
+    "sector": "情報・通信",
+    "type": "雷",
+    "badgeClass": "type-lightning",
+    "cardClass": "card-lightning",
+    "hp": 1020,
+    "maxHp": 1020,
+    "pbr": 1.9,
+    "per": 13,
+    "divYield": 3.1,
+    "ability": {
+      "name": "23期連続増配シールド",
+      "icon": "📶",
+      "desc": "国内屈指の高配当通信株。毎ターンHPを「50」自動回復する。"
+    },
+    "attack1": {
+      "name": "三太郎CMラッシュ",
+      "dmg": 95,
+      "desc": "桃太郎・浦島太郎・金太郎によるお茶の間完全洗脳。"
+    },
+    "attack2": {
+      "name": "ローソン共同経営TOB",
+      "dmg": 210,
+      "desc": "街のコンビニと通信インフラを融合させたリアル拠点爆撃。"
+    },
+    "kana": "けーでぃーでぃーあい",
+    "equity": 5.8
+  },
+  {
+    "code": "3038",
+    "name": "神戸物産 (業務スーパー)",
+    "sector": "卸売業",
+    "type": "草",
+    "badgeClass": "type-grass",
+    "cardClass": "card-grass",
+    "hp": 620,
+    "maxHp": 620,
+    "pbr": 7.2,
+    "per": 31,
+    "divYield": 0.7,
+    "ability": {
+      "name": "自社工場製パン・円高恩恵",
+      "icon": "🍞",
+      "desc": "製販一体の怪物。円高ニュースが発生すると攻撃力が1.5倍に強化。"
+    },
+    "attack1": {
+      "name": "1kg冷凍フライドポテト落とし",
+      "dmg": 105,
+      "desc": "規格外の大容量パックで相手を物理的に圧殺する。"
+    },
+    "attack2": {
+      "name": "タピオカブーム再来トルネード",
+      "dmg": 220,
+      "desc": "直輸入冷凍タピオカの爆売れ伝説を再現する猛烈な一撃。"
+    },
+    "kana": "こうべぶっさん",
+    "equity": 0.18
+  },
+  {
+    "code": "6301",
+    "name": "コマツ (小松製作所)",
+    "sector": "機械",
+    "type": "鋼",
+    "badgeClass": "type-steel",
+    "hp": 920,
+    "maxHp": 920,
+    "pbr": 1.3,
+    "per": 9.8,
+    "divYield": 4,
+    "ability": {
+      "name": "KOMTRAX遠隔監視網",
+      "icon": "📡",
+      "desc": "相手のすべての行動と位置をGPSで把握。回避率+20%。"
+    },
+    "attack1": {
+      "name": "無人ダンプ超大型ホイール",
+      "dmg": 95,
+      "desc": "豪州の巨大鉱山を24時間走る巨大重機プレス。"
+    },
+    "attack2": {
+      "name": "資源国インフラ掘削ショベル",
+      "dmg": 190,
+      "desc": "地球を文字通り削り取る油圧ショベルの一撃。"
+    },
+    "cardClass": "card-steel",
+    "kana": "こまつ",
+    "equity": 3.2
+  },
+  {
+    "code": "3543",
+    "name": "コメダホールディングス",
+    "sector": "小売業",
+    "type": "草",
+    "badgeClass": "type-grass",
+    "hp": 530,
+    "maxHp": 530,
+    "pbr": 3.1,
+    "per": 21,
+    "divYield": 2.2,
+    "ability": {
+      "name": "逆写真詐欺（デカ盛り）",
+      "icon": "☕",
+      "desc": "メニュー写真より実物がデカい。実際の攻撃力が表記より常に+30される。"
+    },
+    "attack1": {
+      "name": "選べるモーニング・トースト",
+      "dmg": 60,
+      "desc": "ゆで卵とおぐらあんで居座る常連客の壁。"
+    },
+    "attack2": {
+      "name": "特大シロノワール落とし",
+      "dmg": 160,
+      "desc": "温かいデニッシュパンにソフトクリームを乗せて相手を圧殺。"
+    },
+    "cardClass": "card-grass",
+    "kana": "こめだほーるでぃんぐす",
+    "equity": 0.05
+  },
+  {
+    "code": "7581",
+    "name": "サイゼリヤ",
+    "sector": "小売業",
+    "type": "草",
+    "badgeClass": "type-grass",
+    "cardClass": "card-grass",
+    "hp": 600,
+    "maxHp": 600,
+    "pbr": 2.7,
+    "per": 28,
+    "divYield": 0.5,
+    "ability": {
+      "name": "圧倒的コスパ神話",
+      "icon": "🥗",
+      "desc": "インフレでも値上げしない。相手の防御効果を無視してダメージを与える。"
+    },
+    "attack1": {
+      "name": "ミラノ風ドリア連打",
+      "dmg": 95,
+      "desc": "300円の奇跡。驚異の原価率で相手の戦意を奪う。"
+    },
+    "attack2": {
+      "name": "マグナムデカンタワイン",
+      "dmg": 200,
+      "desc": "激安イタリア直輸入ワインで相手を泥酔させる一撃。"
+    },
+    "kana": "さいぜりや",
+    "equity": 0.12
+  },
+  {
+    "code": "4751",
+    "name": "サイバーエージェント",
+    "sector": "サービス業",
+    "type": "雷",
+    "badgeClass": "type-lightning",
+    "cardClass": "card-lightning",
+    "hp": 630,
+    "maxHp": 630,
+    "pbr": 2.8,
+    "per": 23,
+    "divYield": 1.5,
+    "ability": {
+      "name": "ABEMA全試合無料中継",
+      "icon": "📺",
+      "desc": "赤字を恐れぬ先行投資。相手の必殺技の威力を20%弱体化させる。"
+    },
+    "attack1": {
+      "name": "ウマ娘・有馬記念スパート",
+      "dmg": 125,
+      "desc": "驚異的セルラン1位を記録した課金エネルギーの大爆発。"
+    },
+    "attack2": {
+      "name": "藤田晋の豪腕勝負手",
+      "dmg": 220,
+      "desc": "麻雀最強位の読みと勝負勘による起死回生の一撃。"
+    },
+    "kana": "さいばーえーじぇんと",
+    "equity": 0.2
+  },
+  {
+    "code": "8136",
+    "name": "サンリオ",
+    "sector": "卸売業",
+    "type": "超",
+    "badgeClass": "type-psychic",
+    "hp": 560,
+    "maxHp": 560,
+    "pbr": 9.2,
+    "per": 41.5,
+    "divYield": 1.2,
+    "ability": {
+      "name": "ハローキティ世界侵略",
+      "icon": "🎀",
+      "desc": "どんなコラボも断らない。全属性の相手に対して弱点を突ける。"
+    },
+    "attack1": {
+      "name": "サンリオキャラクター大賞",
+      "dmg": 100,
+      "desc": "シナモロールとクロミの熱狂的ファン投票弾幕。"
+    },
+    "attack2": {
+      "name": "V字回復ライセンスビジネス",
+      "dmg": 230,
+      "desc": "世界中のブランドと組んでロイヤリティを徴収する怒涛の一撃。"
+    },
+    "cardClass": "card-psychic",
+    "kana": "さんりお",
+    "equity": 0.07
+  },
+  {
+    "code": "4911",
+    "name": "資生堂",
+    "sector": "化学",
+    "type": "超",
+    "badgeClass": "type-psychic",
+    "cardClass": "card-psychic",
+    "hp": 700,
+    "maxHp": 700,
+    "pbr": 1.4,
+    "per": 26,
+    "divYield": 1.8,
+    "ability": {
+      "name": "クレ・ド・ポー高級美肌結界",
+      "icon": "💄",
+      "desc": "プレステージ化粧品のオーラ。受けるダメージを常に15%カット。"
+    },
+    "attack1": {
+      "name": "アルティミューン美容液弾幕",
+      "dmg": 95,
+      "desc": "肌の基礎免疫力を高める世界的美容液で相手を惑わす。"
+    },
+    "attack2": {
+      "name": "グローバルSHISEIDO反撃",
+      "dmg": 205,
+      "desc": "欧米・免税店市場を巻き込む老舗ブランドの起死回生の一撃。"
+    },
+    "kana": "しせいどう",
+    "equity": 0.6
+  },
+  {
+    "code": "2914",
+    "name": "ＪＴ (日本たばこ産業)",
+    "sector": "食料品",
+    "type": "草",
+    "badgeClass": "type-grass",
+    "hp": 960,
+    "maxHp": 960,
+    "pbr": 2.76,
+    "per": 14.5,
+    "divYield": 4.5,
+    "ability": {
+      "name": "超高配当リジェネ",
+      "icon": "💖",
+      "desc": "配当利回り4.5%。毎ターンHPを「70」自動回復する。"
+    },
+    "attack1": {
+      "name": "嗜好品の中毒性アタック",
+      "dmg": 85,
+      "desc": "景気後退でも誰もやめられない鉄板需要。"
+    },
+    "attack2": {
+      "name": "海外たばこ巨額M&A",
+      "dmg": 180,
+      "desc": "欧州・新興国の煙草会社を呑み込む爆撃。"
+    },
+    "cardClass": "card-grass",
+    "kana": "じぇいてぃー",
+    "equity": 3.8
+  },
+  {
+    "code": "3086",
+    "name": "J.フロント リテイリング",
+    "sector": "小売業",
+    "type": "超",
+    "badgeClass": "type-psychic",
+    "cardClass": "card-psychic",
+    "hp": 670,
+    "maxHp": 670,
+    "pbr": 1.1,
+    "per": 14,
+    "divYield": 2.5,
+    "ability": {
+      "name": "大丸松坂屋・富裕層外商網",
+      "icon": "💎",
+      "desc": "億ション外商顧客のバックアップ。受けるダメージを20%カット。"
+    },
+    "attack1": {
+      "name": "デパ地下高級スイーツ弾幕",
+      "dmg": 95,
+      "desc": "行列のできる限定ショコラで相手の警戒心を溶かす。"
+    },
+    "attack2": {
+      "name": "GINZA SIXプレミアム一撃",
+      "dmg": 200,
+      "desc": "銀座の洗練されたラグジュアリー空間による高貴な一撃。"
+    },
+    "kana": "じぇいふろんとりていりんぐ",
+    "equity": 0.4
+  },
+  {
+    "code": "9684",
+    "name": "スクウェア・エニックス・HD",
+    "sector": "情報・通信",
+    "type": "超",
+    "badgeClass": "type-psychic",
+    "cardClass": "card-psychic",
+    "hp": 650,
+    "maxHp": 650,
+    "pbr": 1.9,
+    "per": 20,
+    "divYield": 2.1,
+    "ability": {
+      "name": "国民的RPGの遺産",
+      "icon": "⚔️",
+      "desc": "HPが0になったとき、1度だけ「ザオリク」でHP800で復活する。"
+    },
+    "attack1": {
+      "name": "ギガスラッシュ＆メガフレア",
+      "dmg": 120,
+      "desc": "ドラクエとFFの代名詞的奥義による華麗な連続斬り。"
+    },
+    "attack2": {
+      "name": "HD-2Dノスタルジー一撃",
+      "dmg": 230,
+      "desc": "ドット絵と3Dの融合美で相手の涙腺と戦意を崩壊させる。"
+    },
+    "kana": "すくうぇあえにっくすほーるでぃんぐす",
+    "equity": 0.26
+  },
+  {
+    "code": "7816",
+    "name": "スノーピーク",
+    "sector": "その他製品",
+    "type": "草",
+    "badgeClass": "type-grass",
+    "hp": 500,
+    "maxHp": 500,
+    "pbr": 2.5,
+    "per": 25,
+    "divYield": 0,
+    "ability": {
+      "name": "MBO非公開化シェルター",
+      "icon": "⛺",
+      "desc": "HPが残り10になるとテントに籠もり、3ターンの間無敵になる。"
+    },
+    "attack1": {
+      "name": "チタンマグ＆焚火台沼",
+      "dmg": 50,
+      "desc": "一度ハマったら抜け出せない高価格キャンプギア。"
+    },
+    "attack2": {
+      "name": "大自然オートキャンプ場",
+      "dmg": 140,
+      "desc": "燕三条の職人魂で相手をペグ打ち固定。"
+    },
+    "cardClass": "card-grass",
+    "kana": "すのーぴーく",
+    "equity": 0.02
+  },
+  {
+    "code": "3382",
+    "name": "セブン＆アイ・HD",
+    "sector": "小売業",
+    "type": "草",
+    "badgeClass": "type-grass",
+    "hp": 940,
+    "maxHp": 940,
+    "pbr": 1.4,
+    "per": 18,
+    "divYield": 2.1,
+    "ability": {
+      "name": "外資買収（TOB）防衛シールド",
+      "icon": "🚨",
+      "desc": "カナダのアリマンタシオンから買収提案を受けるとHP全快。"
+    },
+    "attack1": {
+      "name": "セブンカフェ＆金の食パン",
+      "dmg": 80,
+      "desc": "近くて便利なおにぎり・コーヒー補給。"
+    },
+    "attack2": {
+      "name": "北米スピードウェイ制圧",
+      "dmg": 160,
+      "desc": "米国の巨大ガソリンスタンドコンビニ網で突撃。"
+    },
+    "cardClass": "card-grass",
+    "kana": "せぶんあんどあいほーるでぃんぐす",
+    "equity": 3.6
+  },
+  {
+    "code": "7550",
+    "name": "ゼンショーホールディングス",
+    "sector": "小売業",
+    "type": "炎",
+    "badgeClass": "type-fire",
+    "cardClass": "card-fire",
+    "hp": 640,
+    "maxHp": 640,
+    "pbr": 5.8,
+    "per": 34,
+    "divYield": 0.6,
+    "ability": {
+      "name": "世界外食メガコングロマリット",
+      "icon": "🥩",
+      "desc": "外食国内売上首位。HPが半分以下のとき全ワザの威力が1.4倍に覚醒。"
+    },
+    "attack1": {
+      "name": "すき家・三種のチーズ牛丼",
+      "dmg": 105,
+      "desc": "濃厚チーズと特製タレで相手の胃袋を完全に制圧。"
+    },
+    "attack2": {
+      "name": "国内外食ブランド総進撃",
+      "dmg": 230,
+      "desc": "はま寿司・ココス・ロッテリアを巻き込む世界規模の連続攻撃。"
+    },
+    "kana": "ぜんしょーほーるでぃんぐす",
+    "equity": 0.25
+  },
+  {
+    "code": "6758",
+    "name": "ソニーグループ",
+    "sector": "電気機器",
+    "type": "雷",
+    "badgeClass": "type-lightning",
+    "hp": 1120,
+    "maxHp": 1120,
+    "pbr": 2.3,
+    "per": 18.5,
+    "divYield": 0.8,
+    "ability": {
+      "name": "コングロマリット・プレミアム",
+      "icon": "🎬",
+      "desc": "映画・音楽・ゲームの多角化。属性相性の不利を無効化する。"
+    },
+    "attack1": {
+      "name": "PS5独占タイトル攻勢",
+      "dmg": 105,
+      "desc": "AAA級ゲームのグラフィック美で魅了する。"
+    },
+    "attack2": {
+      "name": "CMOSセンサー世界独占",
+      "dmg": 190,
+      "desc": "スマホカメラの急所を完璧に捉える一撃。"
+    },
+    "cardClass": "card-lightning",
+    "kana": "そにーぐるーぷ",
+    "equity": 8.5
+  },
+  {
+    "code": "9984",
+    "name": "ソフトバンクグループ",
+    "sector": "情報・通信",
+    "type": "炎",
+    "badgeClass": "type-fire",
+    "hp": 1150,
+    "maxHp": 1150,
+    "pbr": 1.95,
+    "per": 19.2,
+    "divYield": 0.2,
+    "ability": {
+      "name": "AI特異点（シンギュラリティ）",
+      "icon": "🧠",
+      "desc": "市場に「AIバブル」が発生すると、全ワザの威力が2倍になる。"
+    },
+    "attack1": {
+      "name": "巨額ビジョンファンド砲",
+      "dmg": 130,
+      "desc": "世界の有望スタートアップを札束で買収。"
+    },
+    "attack2": {
+      "name": "ARM上場・時価爆発",
+      "dmg": 280,
+      "desc": "英国の半導体巨頭を梃子にした起死回生の一撃。"
+    },
+    "cardClass": "card-fire",
+    "kana": "そふとばんくぐるーぷ",
+    "equity": 12.0
+  },
+  {
+    "code": "4502",
+    "name": "武田薬品工業",
+    "sector": "医薬品",
+    "type": "超",
+    "badgeClass": "type-psychic",
+    "hp": 1100,
+    "maxHp": 1100,
+    "pbr": 0.95,
+    "per": 28,
+    "divYield": 4.6,
+    "ability": {
+      "name": "シャイアー巨額買収の爪痕",
+      "icon": "💉",
+      "desc": "のれん負債を抱えるが、毎ターン高配当（HP40回復）を維持する。"
+    },
+    "attack1": {
+      "name": "血漿分画製剤メガ供給",
+      "dmg": 90,
+      "desc": "希少疾患の世界的治療薬でじわじわ攻める。"
+    },
+    "attack2": {
+      "name": "グローバルオンコロジー爆撃",
+      "dmg": 200,
+      "desc": "抗がん剤パイプラインによる破壊的一撃。"
+    },
+    "cardClass": "card-psychic",
+    "kana": "たけだやくひんこうぎょう",
+    "equity": 7.3
+  },
+  {
+    "code": "4519",
+    "name": "中外製薬",
+    "sector": "医薬品",
+    "type": "超",
+    "badgeClass": "type-psychic",
+    "cardClass": "card-psychic",
+    "hp": 820,
+    "maxHp": 820,
+    "pbr": 5.5,
+    "per": 28,
+    "divYield": 1.5,
+    "ability": {
+      "name": "ロシュ提携バイオ抗体要塞",
+      "icon": "💊",
+      "desc": "スイス製薬巨頭傘下。最先端創薬力で受けるダメージを「30」軽減。"
+    },
+    "attack1": {
+      "name": "血友病抗体薬ヘムライブラ",
+      "dmg": 115,
+      "desc": "世界中で売れまくるブロックバスター医薬品のロイヤルティ。"
+    },
+    "attack2": {
+      "name": "二重特異性抗体メガビーム",
+      "dmg": 240,
+      "desc": "2つの標的を同時に捉えて分子レベルで相手を解体する。"
+    },
+    "kana": "ちゅうがいせいやく",
+    "equity": 1.6
+  },
+  {
+    "code": "8035",
+    "name": "東京エレクトロン",
+    "sector": "電気機器",
+    "type": "雷",
+    "badgeClass": "type-lightning",
+    "hp": 840,
+    "maxHp": 840,
+    "pbr": 6.8,
+    "per": 26.5,
+    "divYield": 1.8,
+    "ability": {
+      "name": "半導体サイクル・ハイパー",
+      "icon": "⚡",
+      "desc": "クリティカル率が35%と極めて高い。"
+    },
+    "attack1": {
+      "name": "EUVコータ・デベロッパ",
+      "dmg": 120,
+      "desc": "世界シェアほぼ100%のナノ微細加工レーザー。"
+    },
+    "attack2": {
+      "name": "超高アスペクト比エッチング",
+      "dmg": 240,
+      "desc": "3次元積層メモリの深穴を一撃で穿つ。"
+    },
+    "cardClass": "card-lightning",
+    "kana": "とうきょうえれくとろん",
+    "equity": 2.0
+  },
+  {
+    "code": "9602",
+    "name": "東宝",
+    "sector": "サービス業",
+    "type": "炎",
+    "badgeClass": "type-fire",
+    "cardClass": "card-fire",
+    "hp": 680,
+    "maxHp": 680,
+    "pbr": 1.7,
+    "per": 18,
+    "divYield": 1.5,
+    "ability": {
+      "name": "怪獣王の絶対覇権",
+      "icon": "🦖",
+      "desc": "映画館網独占。相手から攻撃を受けた際、「30」の火傷ダメージを反射。"
+    },
+    "attack1": {
+      "name": "邦画独占メガヒット配給",
+      "dmg": 110,
+      "desc": "興行収入100億超えアニメを連発する映画界の巨人。"
+    },
+    "attack2": {
+      "name": "ゴジラ・フルパワー放射熱線",
+      "dmg": 260,
+      "desc": "日比谷本拠地から放たれる青白い破滅の光線。"
+    },
+    "kana": "とうほう",
+    "equity": 0.45
+  },
+  {
+    "code": "7203",
+    "name": "トヨタ自動車",
+    "sector": "輸送用機器",
+    "type": "鋼",
+    "badgeClass": "type-steel",
+    "hp": 1280,
+    "maxHp": 1280,
+    "pbr": 0.91,
+    "per": 10.7,
+    "divYield": 3.5,
+    "ability": {
+      "name": "PBR割安装甲",
+      "icon": "🛡️",
+      "desc": "PBR0.91倍。相手から受けるワザのダメージを常に「30」軽減する。"
+    },
+    "attack1": {
+      "name": "カイゼン・ジャストインタイム",
+      "dmg": 90,
+      "desc": "無駄のないサプライチェーンで確実に相手を削る。"
+    },
+    "attack2": {
+      "name": "世界1000万台供給砲",
+      "dmg": 170,
+      "desc": "圧倒的生産力による世界規模の物量圧殺。"
+    },
+    "cardClass": "card-steel",
+    "kana": "とよたじどうしゃ",
+    "equity": 35.0
+  },
+  {
+    "code": "7201",
+    "name": "日産自動車",
+    "sector": "輸送用機器",
+    "type": "鋼",
+    "badgeClass": "type-steel",
+    "cardClass": "card-steel",
+    "hp": 1020,
+    "maxHp": 1020,
+    "pbr": 0.28,
+    "per": 6.5,
+    "divYield": 4.8,
+    "ability": {
+      "name": "PBR0.28倍の超深海割安",
+      "icon": "🛡️",
+      "desc": "割安すぎて底が抜けない。受けるダメージを常に「40」軽減する。"
+    },
+    "attack1": {
+      "name": "e-POWER瞬発トルク",
+      "dmg": 90,
+      "desc": "エンジン発電・モーター駆動によるタイムラグなしの加速撃。"
+    },
+    "attack2": {
+      "name": "技術の日産・プロパイロット",
+      "dmg": 190,
+      "desc": "手放し自動運転による高速道路完全自動巡航アタック。"
+    },
+    "kana": "にっさんじどうしゃ",
+    "equity": 6.0
+  },
+  {
+    "code": "5401",
+    "name": "日本製鉄",
+    "sector": "鉄鋼",
+    "type": "鋼",
+    "badgeClass": "type-steel",
+    "cardClass": "card-steel",
+    "hp": 1000,
+    "maxHp": 1000,
+    "pbr": 0.65,
+    "per": 7.5,
+    "divYield": 4.5,
+    "ability": {
+      "name": "超高張力ハイテン鋼",
+      "icon": "🔩",
+      "desc": "世界最高峰の鋼板技術。相手のクリティカルヒットを完全に無効化。"
+    },
+    "attack1": {
+      "name": "高炉溶銑スラグラッシュ",
+      "dmg": 110,
+      "desc": "千数百度の真っ赤な溶けた鉄を浴びせかける豪快な攻撃。"
+    },
+    "attack2": {
+      "name": "USスチール2兆円買収砲",
+      "dmg": 240,
+      "desc": "米大統領選を揺るがす空前の歴史的巨額買収アタック。"
+    },
+    "kana": "にっぽんせいてつ",
+    "equity": 4.8
+  },
+  {
+    "code": "9432",
+    "name": "日本電信電話 (NTT)",
+    "sector": "情報・通信",
+    "type": "草",
+    "badgeClass": "type-grass",
+    "hp": 1120,
+    "maxHp": 1120,
+    "pbr": 1.4,
+    "per": 11.2,
+    "divYield": 3.4,
+    "ability": {
+      "name": "25分割・個人投資家包囲網",
+      "icon": "👥",
+      "desc": "株式分割で株主急増。HPが半分以下になると「dポイント結界」で防御力UP。"
+    },
+    "attack1": {
+      "name": "光ファイバー全国通信網",
+      "dmg": 85,
+      "desc": "日本のインターネットインフラによる縛り上げ。"
+    },
+    "attack2": {
+      "name": "IOWN光電融合ビーム",
+      "dmg": 180,
+      "desc": "電力消費100分の1の次世代光ネットワーク直撃。"
+    },
+    "cardClass": "card-grass",
+    "kana": "にっぽんでんしんでんわ",
+    "equity": 9.5
+  },
+  {
+    "code": "9101",
+    "name": "日本郵船",
+    "sector": "海運業",
+    "type": "水",
+    "badgeClass": "type-water",
+    "hp": 880,
+    "maxHp": 880,
+    "pbr": 0.82,
+    "per": 6.2,
+    "divYield": 5.1,
+    "ability": {
+      "name": "コンテナ運賃バブルの残光",
+      "icon": "🚢",
+      "desc": "手元キャッシュ数兆円。HPが0になっても1回だけHP500で蘇生する。"
+    },
+    "attack1": {
+      "name": "ONEコンテナ船隊出航",
+      "dmg": 110,
+      "desc": "マゼンタ色の巨大船団が太平洋を埋め尽くす。"
+    },
+    "attack2": {
+      "name": "配当利回り爆撃",
+      "dmg": 220,
+      "desc": "空前の株主還元マネーで相手を圧倒。"
+    },
+    "cardClass": "card-water",
+    "kana": "にっぽんゆうせん",
+    "equity": 2.6
+  },
+  {
+    "code": "6594",
+    "name": "ニデック (日本電産)",
+    "sector": "電気機器",
+    "type": "雷",
+    "badgeClass": "type-lightning",
+    "cardClass": "card-lightning",
+    "hp": 820,
+    "maxHp": 820,
+    "pbr": 2.1,
+    "per": 18,
+    "divYield": 1.3,
+    "ability": {
+      "name": "一番以外は全部ビリ",
+      "icon": "⚡",
+      "desc": "永守イズム。先攻を取るとワザの威力が常に「+30」加算される。"
+    },
+    "attack1": {
+      "name": "HDDモーター世界シェア80%",
+      "dmg": 115,
+      "desc": "超精密ブラシレスモーターによる超高速回転プレス。"
+    },
+    "attack2": {
+      "name": "EVトラクションE-Axle総攻撃",
+      "dmg": 230,
+      "desc": "中国・世界のEV市場を席巻するモーター・ギア一体型爆撃。"
+    },
+    "kana": "にでっく",
+    "equity": 1.6
+  },
+  {
+    "code": "9843",
+    "name": "ニトリホールディングス",
+    "sector": "小売業",
+    "type": "草",
+    "badgeClass": "type-grass",
+    "hp": 730,
+    "maxHp": 730,
+    "pbr": 2.1,
+    "per": 24.5,
+    "divYield": 1.1,
+    "ability": {
+      "name": "円高絶対正義",
+      "icon": "🛋️",
+      "desc": "輸入家具のため、「円高」になると攻撃力が2倍、受けるダメージが半減する。"
+    },
+    "attack1": {
+      "name": "お、ねだん以上連打",
+      "dmg": 70,
+      "desc": "圧倒的なコスパで相手の戦意をくじく。"
+    },
+    "attack2": {
+      "name": "Nクール寝具冷却ビーム",
+      "dmg": 160,
+      "desc": "ひんやり接触冷感で相手を凍結（行動不能）にする。"
+    },
+    "cardClass": "card-grass",
+    "kana": "にとりほーるでぃんぐす",
+    "equity": 0.85
+  },
+  {
+    "code": "9201",
+    "name": "日本航空 (JAL)",
+    "sector": "空運業",
+    "type": "水",
+    "badgeClass": "type-water",
+    "cardClass": "card-water",
+    "hp": 740,
+    "maxHp": 740,
+    "pbr": 1.05,
+    "per": 11,
+    "divYield": 2.8,
+    "ability": {
+      "name": "稲盛フィロソフィ・アメーバ採算",
+      "icon": "✈️",
+      "desc": "徹底的な部門別採算管理。受けるダメージを常に「25」軽減。"
+    },
+    "attack1": {
+      "name": "おもてなしファーストクラス",
+      "dmg": 105,
+      "desc": "極上のホスピタリティで相手の敵対心を骨抜きにする。"
+    },
+    "attack2": {
+      "name": "A350最新鋭機ロングフライト",
+      "dmg": 215,
+      "desc": "静粛性と低燃費を誇るフラッグシップ機の長距離空爆。"
+    },
+    "kana": "にほんこうくう",
+    "equity": 0.9
+  },
+  {
+    "code": "7974",
+    "name": "任天堂",
+    "sector": "その他製品",
+    "type": "雷",
+    "badgeClass": "type-lightning",
+    "hp": 900,
+    "maxHp": 900,
+    "pbr": 3.4,
+    "per": 22.8,
+    "divYield": 2.8,
+    "ability": {
+      "name": "無借金サンクチュアリ",
+      "icon": "🏰",
+      "desc": "自己資本比率77%超。利上げ・不況などのデバフを一切受けない。"
+    },
+    "attack1": {
+      "name": "世界的キラーIP行使",
+      "dmg": 110,
+      "desc": "マリオ・ポケモンの知的財産権で殴る。"
+    },
+    "attack2": {
+      "name": "次世代機サプライズ発表",
+      "dmg": 260,
+      "desc": "50%の確率で発動。表なら260打点、裏なら発売延期で失敗。"
+    },
+    "cardClass": "card-lightning",
+    "kana": "にんてんどう",
+    "equity": 2.8
+  },
+  {
+    "code": "7832",
+    "name": "バンダイナムコホールディングス",
+    "sector": "その他製品",
+    "type": "炎",
+    "badgeClass": "type-fire",
+    "cardClass": "card-fire",
+    "hp": 720,
+    "maxHp": 720,
+    "pbr": 2.4,
+    "per": 21,
+    "divYield": 1.8,
+    "ability": {
+      "name": "ガンダム・世界的IP包囲網",
+      "icon": "🤖",
+      "desc": "どんな相性不利も受け付けない。全属性に対して弱点なし。"
+    },
+    "attack1": {
+      "name": "ガンプラ即完売ラッシュ",
+      "dmg": 115,
+      "desc": "世界中のファンが奪い合う精密プラスチックの弾幕。"
+    },
+    "attack2": {
+      "name": "超かめはめ波・メガ粒子砲",
+      "dmg": 250,
+      "desc": "日本が世界に誇る最強キャラクターたちの合体総攻撃。"
+    },
+    "kana": "ばんだいなむこほーるでぃんぐす",
+    "equity": 0.75
+  },
+  {
+    "code": "7532",
+    "name": "パン・パシフィック・HD (ドンキ)",
+    "sector": "小売業",
+    "type": "炎",
+    "badgeClass": "type-fire",
+    "cardClass": "card-fire",
+    "hp": 690,
+    "maxHp": 690,
+    "pbr": 3.8,
+    "per": 25,
+    "divYield": 0.7,
+    "ability": {
+      "name": "圧縮陳列ジャングル",
+      "icon": "🐧",
+      "desc": "天井まで積み上がった商品。相手の攻撃が20%の確率でミスする。"
+    },
+    "attack1": {
+      "name": "情熱価格メガ盛り落とし",
+      "dmg": 110,
+      "desc": "ありえない安さとサイズ感で相手の度肝を抜く。"
+    },
+    "attack2": {
+      "name": "深夜営業ドンキテーマ爆音",
+      "dmg": 230,
+      "desc": "ミラクルショッピングのBGMで相手の脳を完全に破壊する。"
+    },
+    "kana": "ぱんぱしふぃっくほーるでぃんぐす",
+    "equity": 0.55
+  },
+  {
+    "code": "9020",
+    "name": "東日本旅客鉄道 (JR東日本)",
+    "sector": "陸運業",
+    "type": "鋼",
+    "badgeClass": "type-steel",
+    "cardClass": "card-steel",
+    "hp": 920,
+    "maxHp": 920,
+    "pbr": 1.2,
+    "per": 17,
+    "divYield": 1.8,
+    "ability": {
+      "name": "Suica絶対生活インフラ",
+      "icon": "🚆",
+      "desc": "改札タッチの度にチャージ。毎ターンHPを「45」自動回復。"
+    },
+    "attack1": {
+      "name": "はやぶさ時速320km突撃",
+      "dmg": 120,
+      "desc": "国内最速新幹線の圧倒的運動エネルギーによる体当たり。"
+    },
+    "attack2": {
+      "name": "山手線超過密ダイヤ包囲網",
+      "dmg": 230,
+      "desc": "2分間隔で走る環状線で相手の逃げ場を完全に塞ぎ圧迫する。"
+    },
+    "kana": "ひがしにっぽんりょかくてつどう",
+    "equity": 3.2
+  },
+  {
+    "code": "6501",
+    "name": "日立製作所",
+    "sector": "電気機器",
+    "type": "雷",
+    "badgeClass": "type-lightning",
+    "hp": 1080,
+    "maxHp": 1080,
+    "pbr": 3.1,
+    "per": 22,
+    "divYield": 1.4,
+    "ability": {
+      "name": "事業ポートフォリオ大手術",
+      "icon": "🩺",
+      "desc": "赤字子会社をすべて売却済み。無駄な被ダメージを20%カット。"
+    },
+    "attack1": {
+      "name": "Lumada（ルマーダ）DXソリューション",
+      "dmg": 110,
+      "desc": "OT×ITによる巨大社会インフラ最適化。"
+    },
+    "attack2": {
+      "name": "英国高速鉄道運行ジャック",
+      "dmg": 200,
+      "desc": "世界中の送配電網と鉄道網を一斉制覇。"
+    },
+    "cardClass": "card-lightning",
+    "kana": "ひたちせいさくしょ",
+    "equity": 6.5
+  },
+  {
+    "code": "9983",
+    "name": "ファーストリテイリング",
+    "sector": "小売業",
+    "type": "草",
+    "badgeClass": "type-grass",
+    "hp": 860,
+    "maxHp": 860,
+    "pbr": 7.1,
+    "per": 38.2,
+    "divYield": 0.9,
+    "ability": {
+      "name": "世界的SPA防寒壁",
+      "icon": "🧥",
+      "desc": "寒波が来るたびに売上が急増。攻撃を受けると相手に30反射ダメージ。"
+    },
+    "attack1": {
+      "name": "ヒートテック大量増産",
+      "dmg": 95,
+      "desc": "世界中の冬を支配する薄型繊維ラッシュ。"
+    },
+    "attack2": {
+      "name": "欧米・アジア同時進撃",
+      "dmg": 210,
+      "desc": "柳井正のグローバル出店号令による総攻撃。"
+    },
+    "cardClass": "card-grass",
+    "kana": "ふぁーすとりていりんぐ",
+    "equity": 2.1
+  },
+  {
+    "code": "4901",
+    "name": "富士フイルムホールディングス",
+    "sector": "化学",
+    "type": "超",
+    "badgeClass": "type-psychic",
+    "cardClass": "card-psychic",
+    "hp": 920,
+    "maxHp": 920,
+    "pbr": 1.6,
+    "per": 17.5,
+    "divYield": 1.6,
+    "ability": {
+      "name": "写真からバイオへの大転身",
+      "icon": "🧪",
+      "desc": "本業消失の危機を克服した変革力。属性の弱点不利を完全に無効化。"
+    },
+    "attack1": {
+      "name": "チェキ世界大ヒットスナップ",
+      "dmg": 110,
+      "desc": "Z世代を熱狂させるアナログインスタントカメラの爆発的人気。"
+    },
+    "attack2": {
+      "name": "バイオCDMO巨大培養タンク砲",
+      "dmg": 235,
+      "desc": "日米欧の受託製造巨大バイオプラントによる怒涛の総攻撃。"
+    },
+    "kana": "ふじふいるむほーるでぃんぐす",
+    "equity": 3.2
+  },
+  {
+    "code": "3563",
+    "name": "FOOD & LIFE COMPANIES",
+    "sector": "小売業",
+    "type": "水",
+    "badgeClass": "type-water",
+    "cardClass": "card-water",
+    "hp": 580,
+    "maxHp": 580,
+    "pbr": 3.2,
+    "per": 22,
+    "divYield": 0.8,
+    "ability": {
+      "name": "デジロー回転レーン",
+      "icon": "🍣",
+      "desc": "巨大画面から寿司が続々到着。毎ターンHPを「50」自動回復。"
+    },
+    "attack1": {
+      "name": "倍盛りマグロ爆撃",
+      "dmg": 100,
+      "desc": "回転寿司最大手の物量で相手を圧倒する。"
+    },
+    "attack2": {
+      "name": "限界赤字まぐろ祭り",
+      "dmg": 215,
+      "desc": "利益度外視の創業祭メニューによる怒涛の総攻撃。"
+    },
+    "kana": "ふーどあんどらいふかんぱにーず",
+    "equity": 0.09
+  },
+  {
+    "code": "7267",
+    "name": "ホンダ (本田技研工業)",
+    "sector": "輸送用機器",
+    "type": "鋼",
+    "badgeClass": "type-steel",
+    "hp": 1180,
+    "maxHp": 1180,
+    "pbr": 0.55,
+    "per": 6.8,
+    "divYield": 4.2,
+    "ability": {
+      "name": "二輪世界王者（スーパーカブ）",
+      "icon": "🛵",
+      "desc": "どんな悪路（不況）でも絶対に壊れないタフネス。"
+    },
+    "attack1": {
+      "name": "VTECエンジン高回転",
+      "dmg": 100,
+      "desc": "官能的なエンジンサウンドとともに急加速。"
+    },
+    "attack2": {
+      "name": "ホンダジェット成層圏アタック",
+      "dmg": 210,
+      "desc": "主翼上面エンジン配置による超高速急降下。"
+    },
+    "cardClass": "card-steel",
+    "kana": "ほんだ",
+    "equity": 13.0
+  },
+  {
+    "code": "8411",
+    "name": "みずほフィナンシャルグループ",
+    "sector": "銀行業",
+    "type": "水",
+    "badgeClass": "type-water",
+    "cardClass": "card-water",
+    "hp": 1160,
+    "maxHp": 1160,
+    "pbr": 0.92,
+    "per": 10.8,
+    "divYield": 3.3,
+    "ability": {
+      "name": "興銀DNA・大企業メインバンク",
+      "icon": "🏢",
+      "desc": "日本の上場企業7割と取引。安定した資金力で相手のデバフを軽減。"
+    },
+    "attack1": {
+      "name": "勘定系MINORI完全稼働",
+      "dmg": 100,
+      "desc": "4000億円投じた巨大基幹システムによる堅牢なトランザクション。"
+    },
+    "attack2": {
+      "name": "青のメガバンク総融資爆撃",
+      "dmg": 215,
+      "desc": "産業金融のプライドを賭けた巨額シンジケートローン砲。"
+    },
+    "kana": "みずほふぃなんしゃるぐるーぷ",
+    "equity": 11.0
+  },
+  {
+    "code": "8316",
+    "name": "三井住友フィナンシャルG",
+    "sector": "銀行業",
+    "type": "水",
+    "badgeClass": "type-water",
+    "cardClass": "card-water",
+    "hp": 1200,
+    "maxHp": 1200,
+    "pbr": 0.98,
+    "per": 11.5,
+    "divYield": 3.1,
+    "ability": {
+      "name": "Olive経済圏の急進撃",
+      "icon": "🫒",
+      "desc": "Vポイント統合とOliveマルチナンバーレスで毎ターンHP「50」回復。"
+    },
+    "attack1": {
+      "name": "緑のメガバンク強気貸出",
+      "dmg": 110,
+      "desc": "圧倒的な機動力と収益力で相手のキャッシュを刈り取る。"
+    },
+    "attack2": {
+      "name": "ナンバーレスカード乱舞",
+      "dmg": 220,
+      "desc": "年会費無料と高還元率で若年層を囲い込む怒涛の一撃。"
+    },
+    "kana": "みついすみともふぃなんしゃる",
+    "equity": 15.0
+  },
+  {
+    "code": "8801",
+    "name": "三井不動産",
+    "sector": "不動産業",
+    "type": "鋼",
+    "badgeClass": "type-steel",
+    "cardClass": "card-steel",
+    "hp": 940,
+    "maxHp": 940,
+    "pbr": 1.25,
+    "per": 14.5,
+    "divYield": 2.1,
+    "ability": {
+      "name": "日本橋・八重洲の巨大大家",
+      "icon": "🏙️",
+      "desc": "オフィス・商業施設の莫大賃料。毎ターンHPを「60」自動回復。"
+    },
+    "attack1": {
+      "name": "ららぽーとファミリー大動員",
+      "dmg": 105,
+      "desc": "休日渋滞を引き起こす圧倒的集客力で相手を圧倒。"
+    },
+    "attack2": {
+      "name": "東京ミッドタウン超高層プレス",
+      "dmg": 225,
+      "desc": "都心一等地の複合都市再開発マネーで相手を圧殺する。"
+    },
+    "kana": "みついふどうさん",
+    "equity": 3.6
+  },
+  {
+    "code": "7011",
+    "name": "三菱重工業",
+    "sector": "機械",
+    "type": "鋼",
+    "badgeClass": "type-steel",
+    "hp": 860,
+    "maxHp": 860,
+    "pbr": 3.8,
+    "per": 34.2,
+    "divYield": 1.1,
+    "ability": {
+      "name": "防衛予算倍増バフ",
+      "icon": "🚀",
+      "desc": "地政学リスクニュースが発生すると、攻撃力が2倍になる。"
+    },
+    "attack1": {
+      "name": "H3ロケット打ち上げ",
+      "dmg": 130,
+      "desc": "日本の基幹ロケットによる宇宙直行便。"
+    },
+    "attack2": {
+      "name": "次世代ステルス戦闘機",
+      "dmg": 250,
+      "desc": "防衛省調達の最先端迎撃システム起動。"
+    },
+    "cardClass": "card-steel",
+    "kana": "みつびしじゅうこうぎょう",
+    "equity": 2.3
+  },
+  {
+    "code": "8306",
+    "name": "三菱UFJフィナンシャルG",
+    "sector": "銀行業",
+    "type": "水",
+    "badgeClass": "type-water",
+    "hp": 1240,
+    "maxHp": 1240,
+    "pbr": 1.76,
+    "per": 12.1,
+    "divYield": 2.7,
+    "ability": {
+      "name": "利上げゴールドラッシュ",
+      "icon": "🏦",
+      "desc": "金利上昇ニュースが起きるたび、攻撃力が恒久的に+40加算される。"
+    },
+    "attack1": {
+      "name": "預貸金スプレッド拡大",
+      "dmg": 100,
+      "desc": "金利差益による安定した富の収奪。"
+    },
+    "attack2": {
+      "name": "赤白メガバンク総出撃",
+      "dmg": 190,
+      "desc": "国内最大の資金量で相手を呑み込む津波。"
+    },
+    "cardClass": "card-water",
+    "kana": "みつびしゆーえふじぇいふぃなんしゃる",
+    "equity": 20.0
+  },
+  {
+    "code": "4385",
+    "name": "メルカリ",
+    "sector": "情報・通信",
+    "type": "雷",
+    "badgeClass": "type-lightning",
+    "hp": 550,
+    "maxHp": 550,
+    "pbr": 4.1,
+    "per": 31,
+    "divYield": 0,
+    "ability": {
+      "name": "匿名らくらく配送",
+      "icon": "📦",
+      "desc": "身元を明かさず攻撃。反撃ダメージを一切受けない。"
+    },
+    "attack1": {
+      "name": "不用品即座出品フラッシュ",
+      "dmg": 75,
+      "desc": "スマホカメラで撮って10秒で売り捌く。"
+    },
+    "attack2": {
+      "name": "メルペイ＆メルコイン決済",
+      "dmg": 170,
+      "desc": "暗号資産と売上金エコシステムによる経済圏アタック。"
+    },
+    "cardClass": "card-lightning",
+    "kana": "めるかり",
+    "equity": 0.06
+  },
+  {
+    "code": "8153",
+    "name": "モスフードサービス",
+    "sector": "小売業",
+    "type": "草",
+    "badgeClass": "type-grass",
+    "cardClass": "card-grass",
+    "hp": 530,
+    "maxHp": 530,
+    "pbr": 1.8,
+    "per": 29,
+    "divYield": 1.1,
+    "ability": {
+      "name": "契約農家直送生野菜",
+      "icon": "🍅",
+      "desc": "健康志向の鉄壁素材。毎ターンHPを「40」自動回復する。"
+    },
+    "attack1": {
+      "name": "特製ミートソース落とし",
+      "dmg": 95,
+      "desc": "バーガーから溢れ出る熱々ソースで相手を包み込む。"
+    },
+    "attack2": {
+      "name": "ライスバーガー圧殺プレス",
+      "dmg": 195,
+      "desc": "国産米プレートで相手を挟み撃ちにする和風必殺技。"
+    },
+    "kana": "もすふーどさーびす",
+    "equity": 0.05
+  },
+  {
+    "code": "4689",
+    "name": "LINEヤフー",
+    "sector": "情報・通信",
+    "type": "草",
+    "badgeClass": "type-grass",
+    "cardClass": "card-grass",
+    "hp": 900,
+    "maxHp": 900,
+    "pbr": 0.95,
+    "per": 15,
+    "divYield": 1.5,
+    "ability": {
+      "name": "PayPay国内キャッシュレス覇権",
+      "icon": "📱",
+      "desc": "登録者6000万人超。毎ターン相手からHP「30」を吸い取る。"
+    },
+    "attack1": {
+      "name": "既読スルーの精神打撃",
+      "dmg": 85,
+      "desc": "送ったメッセージに返信が来ない地獄の精神的苦痛。"
+    },
+    "attack2": {
+      "name": "超PayPay祭りポイント乱舞",
+      "dmg": 190,
+      "desc": "全額還元の歓喜で相手の判断力を麻痺させる一撃。"
+    },
+    "kana": "らいんやふー",
+    "equity": 2.8
+  },
+  {
+    "code": "4755",
+    "name": "楽天グループ",
+    "sector": "サービス業",
+    "type": "炎",
+    "badgeClass": "type-fire",
+    "cardClass": "card-fire",
+    "hp": 780,
+    "maxHp": 780,
+    "pbr": 2.1,
+    "per": 0,
+    "divYield": 0,
+    "ability": {
+      "name": "楽天経済圏SPUの呪い",
+      "icon": "🔴",
+      "desc": "カード・銀行・証券のポイント拘束。相手は交代や逃走ができない。"
+    },
+    "attack1": {
+      "name": "お買い物マラソン完走",
+      "dmg": 105,
+      "desc": "10店舗買い回りのポイント10倍エネルギーで殴る。"
+    },
+    "attack2": {
+      "name": "三木谷プラチナバンド特攻",
+      "dmg": 240,
+      "desc": "悲願の周波数を手に入れた決死の総攻撃（30%で自傷40）。"
+    },
+    "kana": "らくてんぐるーぷ",
+    "equity": 1.1
+  },
+  {
+    "code": "6098",
+    "name": "リクルートHD",
+    "sector": "サービス業",
+    "type": "雷",
+    "badgeClass": "type-lightning",
+    "hp": 820,
+    "maxHp": 820,
+    "pbr": 6.5,
+    "per": 36.8,
+    "divYield": 0.7,
+    "ability": {
+      "name": "圧倒的当事者意識",
+      "icon": "🔥",
+      "desc": "ピンチになるほど社員が覚醒。HP30%以下で攻撃力+50。"
+    },
+    "attack1": {
+      "name": "ゼクシィ＆ホットペッパー包囲",
+      "dmg": 90,
+      "desc": "人生のすべてのライフイベントを押さえる。"
+    },
+    "attack2": {
+      "name": "Indeed世界求人プラットフォーム",
+      "dmg": 220,
+      "desc": "世界中の求職者データをAIマッチングで叩き込む。"
+    },
+    "cardClass": "card-lightning",
+    "kana": "りくるーとほーるでぃんぐす",
+    "equity": 1.7
+  },
+  {
+    "code": "6723",
+    "name": "ルネサスエレクトロニクス",
+    "sector": "電気機器",
+    "type": "雷",
+    "badgeClass": "type-lightning",
+    "cardClass": "card-lightning",
+    "hp": 830,
+    "maxHp": 830,
+    "pbr": 1.8,
+    "per": 12,
+    "divYield": 0,
+    "ability": {
+      "name": "車載マイコン世界首位",
+      "icon": "🚗",
+      "desc": "世界中の自動車がルネサスなしでは動かない。攻撃が絶対に命中。"
+    },
+    "attack1": {
+      "name": "那珂工場奇跡の早期復旧",
+      "dmg": 105,
+      "desc": "どんな災害からも不死鳥のごとく立ち上がるサプライチェーン。"
+    },
+    "attack2": {
+      "name": "次世代ADAS自動運転チップ",
+      "dmg": 225,
+      "desc": "超低消費電力AIプロセッサによるミリ秒単位の急所狙い。"
+    },
+    "kana": "るねさすえれくとろにくす",
+    "equity": 1.9
+  },
+  {
+    "code": "6920",
+    "name": "レーザーテック",
+    "sector": "電気機器",
+    "type": "雷",
+    "badgeClass": "type-lightning",
+    "hp": 600,
+    "maxHp": 600,
+    "pbr": 28.5,
+    "per": 45,
+    "divYield": 1.1,
+    "ability": {
+      "name": "EUVマスク検査世界シェア100%",
+      "icon": "🔬",
+      "desc": "TSMCもサムスンも頭が上がらない。攻撃が絶対に命中する。"
+    },
+    "attack1": {
+      "name": "空売りファンドとのデスマッチ",
+      "dmg": 140,
+      "desc": "東証売買代金トップを独走する狂気のボラティリティ。"
+    },
+    "attack2": {
+      "name": "EUV光波干渉アクシオン砲",
+      "dmg": 270,
+      "desc": "極端紫外線でシリコンウエハーの欠陥を焼き尽くす。"
+    },
+    "cardClass": "card-lightning",
+    "kana": "れーざーてっく",
+    "equity": 0.15
+  }
+];
+
+let p1 = null;
+let p2 = null;
+let battleInterval = null;
+let turn = 1;
+let battlePhase = "SELECT"; // "SELECT" | "MORNING_NEWS" | "MARKET_OPEN" | "FIGHTING" | "ENDED"
+let isBattleRunning = false;
+let isAutoPlay = false; // デフォルトは手動進行
+let hasMorningNewsApplied = false;
+
+function initSelects() {
+  const s1 = document.getElementById('p1Select');
+  const s2 = document.getElementById('p2Select');
+
+  s1.innerHTML = "";
+  s2.innerHTML = "";
+
+  CARDS_DATA.forEach((card, idx) => {
+    const opt1 = document.createElement('option');
+    opt1.value = idx;
+    // リクエスト対応：コードを外し「企業名　職種」の順で五十音順表示
+    opt1.text = `${card.name}　${card.sector}`;
+    s1.appendChild(opt1);
+
+    const opt2 = document.createElement('option');
+    opt2.value = idx;
+    opt2.text = `${card.name}　${card.sector}`;
+    s2.appendChild(opt2);
+  });
+
+  // 初期値：武田薬品(4502) vs トヨタ自動車(7203)
+  const defaultP1Idx = CARDS_DATA.findIndex(c => c.code === "4502");
+  const defaultP2Idx = CARDS_DATA.findIndex(c => c.code === "7203");
+  s1.value = defaultP1Idx >= 0 ? defaultP1Idx : 0;
+  s2.value = defaultP2Idx >= 0 ? defaultP2Idx : 1;
+
+  changeFighter('p1');
+  changeFighter('p2');
+}
+
+function renderCardHtml(card) {
+  return `
+    <div class="card ${card.cardClass}">
+      <div class="card-inner">
+        <div class="card-header">
+          <span class="card-name">${card.name} <span class="card-code">#${card.code}</span></span>
+          <span class="type-badge ${card.badgeClass}">${card.type}</span>
+        </div>
+        <div class="chart-window">
+          <div class="chart-header">
+            <span>PBR: ${card.pbr}倍</span>
+            <span style="color:#22c55e;">配当: ${card.divYield}%</span>
+          </div>
+          <svg class="chart-canvas" viewBox="0 0 300 90">
+            <path d="M 0,60 Q 70,20 140,50 T 300,20" fill="none" stroke="#22c55e" stroke-width="3"/>
+          </svg>
+        </div>
+        <div class="ability-box">
+          <div class="ability-title">${card.ability.icon} 特性: ${card.ability.name}</div>
+          <div class="ability-desc">${card.ability.desc}</div>
+        </div>
+        <div class="attack-list">
+          <div class="attack-item">
+            <div class="attack-top">
+              <span class="attack-name">${card.attack1.name}</span>
+              <span class="attack-damage">${card.attack1.dmg} dmg</span>
+            </div>
+            <div class="attack-desc">${card.attack1.desc}</div>
+          </div>
+          <div class="attack-item">
+            <div class="attack-top">
+              <span class="attack-name">${card.attack2.name}</span>
+              <span class="attack-damage">${card.attack2.dmg} dmg</span>
+            </div>
+            <div class="attack-desc">${card.attack2.desc}</div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <span>業種: ${card.sector}</span>
+          <span>初期HP: ${card.maxHp}</span>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function changeFighter(slot) {
+  if (battlePhase !== "SELECT") return;
+  const select = document.getElementById(slot + 'Select');
+  const cardData = JSON.parse(JSON.stringify(CARDS_DATA[select.value]));
+
+  if (slot === 'p1') {
+    p1 = cardData;
+    p1.currentHp = p1.hp;
+    document.getElementById('p1-name-display').innerText = p1.name;
+    document.getElementById('p1-card-slot').innerHTML = renderCardHtml(p1);
+  } else {
+    p2 = cardData;
+    p2.currentHp = p2.hp;
+    document.getElementById('p2-name-display').innerText = p2.name;
+    document.getElementById('p2-card-slot').innerHTML = renderCardHtml(p2);
+  }
+  hasMorningNewsApplied = false;
+  updateHpDisplay();
+}
+
+function pickRandomMatchup() {
+  if (battlePhase !== "SELECT") return;
+  const s1 = document.getElementById('p1Select');
+  const s2 = document.getElementById('p2Select');
+  const r1 = Math.floor(Math.random() * CARDS_DATA.length);
+  let r2 = Math.floor(Math.random() * CARDS_DATA.length);
+  while (r1 === r2) {
+    r2 = Math.floor(Math.random() * CARDS_DATA.length);
+  }
+  s1.value = r1;
+  s2.value = r2;
+  changeFighter('p1');
+  changeFighter('p2');
+  setCutin(`🎲 ランダム選出！`, `『${p1.name}』 VS 『${p2.name}』！`, "event");
+}
+
+function setCutin(topHtml, bottomHtml, type = "normal") {
+  const banner = document.getElementById('cutinBanner');
+  const topElem = document.getElementById('cutinTop');
+  const bottomElem = document.getElementById('cutinBottom');
+
+  topElem.innerHTML = topHtml;
+  bottomElem.innerHTML = bottomHtml;
+
+  if (type === "event") {
+    banner.style.borderColor = "#f59e0b";
+  } else if (type === "damage") {
+    banner.style.borderColor = "#ef4444";
+  } else if (type === "buff") {
+    banner.style.borderColor = "#22c55e";
+  } else {
+    banner.style.borderColor = "#38bdf8";
+  }
+}
+
+function addLog(msg, type = "") {
+  const monitor = document.getElementById('logMonitor');
+  const div = document.createElement('div');
+  div.className = "log-line " + type;
+  div.innerHTML = msg;
+  monitor.prepend(div);
+}
+
+function updateHpDisplay() {
+  if (!p1 || !p2) return;
+
+  // P1
+  const p1Overheal = p1.currentHp > p1.maxHp;
+  const p1Pct = Math.max(0, Math.min(100, (p1.currentHp / p1.maxHp) * 100));
+  const p1Bar = document.getElementById('p1-hp-bar');
+  p1Bar.style.width = p1Pct + "%";
+  let p1Text = `HP ${p1.currentHp} / ${p1.maxHp}`;
+  if (p1Overheal) {
+    p1Bar.classList.remove('danger');
+    p1Bar.classList.add('overheal');
+    p1Text += ` <span class="hp-overheal-badge">(+${p1.currentHp - p1.maxHp}突破!)</span>`;
+  } else {
+    p1Bar.classList.remove('overheal');
+    if (p1Pct < 30) p1Bar.classList.add('danger');
+    else p1Bar.classList.remove('danger');
+  }
+  document.getElementById('p1-hp-text').innerHTML = p1Text;
+
+  // P2
+  const p2Overheal = p2.currentHp > p2.maxHp;
+  const p2Pct = Math.max(0, Math.min(100, (p2.currentHp / p2.maxHp) * 100));
+  const p2Bar = document.getElementById('p2-hp-bar');
+  p2Bar.style.width = p2Pct + "%";
+  let p2Text = `HP ${p2.currentHp} / ${p2.maxHp}`;
+  if (p2Overheal) {
+    p2Bar.classList.remove('danger');
+    p2Bar.classList.add('overheal');
+    p2Text += ` <span class="hp-overheal-badge">(+${p2.currentHp - p2.maxHp}突破!)</span>`;
+  } else {
+    p2Bar.classList.remove('overheal');
+    if (p2Pct < 30) p2Bar.classList.add('danger');
+    else p2Bar.classList.remove('danger');
+  }
+  document.getElementById('p2-hp-text').innerHTML = p2Text;
+}
+
+// 【試合前フェーズ】朝刊ニュース一斉適用（気配値チェック）
+function applyMorningNews() {
+  hasMorningNewsApplied = true;
+
+  let newsAppliedCount = 0;
+  let summaryRows = [];
+
+  const morningPool = TODAY_EVENTS.filter(ev => ev.timing === "MORNING" || ev.timing === "BOTH");
+  morningPool.forEach(ev => {
+    [p1, p2].forEach(p => {
+      let isTarget = false;
+      if (ev.targetScope === "ALL") isTarget = true;
+      if (ev.targetSectors && ev.targetSectors.includes(p.sector)) isTarget = true;
+      if (ev.targetCodes && ev.targetCodes.includes(p.code)) isTarget = true;
+
+      if (isTarget) {
+        newsAppliedCount++;
+        if (ev.effectType === "DAMAGE" || ev.effectType === "DAMAGE_AND_BREAK") {
+          p.currentHp = Math.max(10, p.currentHp - ev.value); // 戦前なので最低10残す
+          summaryRows.push({
+            type: "damage",
+            html: `💥 【${ev.newsTitle}】により『${p.name}』に <span class="dmg-highlight">-${ev.value} dmg</span> 直撃！`,
+            log: `💥 【${ev.newsTitle}】により『${p.name}』に -${ev.value} dmg！ （${ev.reason}）`
+          });
+        } else if (ev.effectType === "HEAL") {
+          // ★リクエスト対応：HPマックスを超えて上限突破加算！
+          p.currentHp = p.currentHp + ev.value;
+          const overhealBadge = p.currentHp > p.maxHp ? ` (+${p.currentHp - p.maxHp}突破!)` : "";
+          summaryRows.push({
+            type: "buff",
+            html: `💖 【${ev.newsTitle}】により『${p.name}』が <span class="buff-highlight">+${ev.value} HP上限突破！</span>${overhealBadge}`,
+            log: `💖 【${ev.newsTitle}】により『${p.name}』が +${ev.value} HP上限突破！ （${ev.reason}）`
+          });
+        } else if (ev.effectType === "BUFF_ATK") {
+          p.attack1.dmg = Math.floor(p.attack1.dmg * ev.value);
+          p.attack2.dmg = Math.floor(p.attack2.dmg * ev.value);
+          summaryRows.push({
+            type: "buff",
+            html: `🛡️ 【${ev.newsTitle}】により『${p.name}』の攻撃力が <span class="buff-highlight">2倍に覚醒！</span>`,
+            log: `🛡️ 【${ev.newsTitle}】により『${p.name}』の攻撃力が2倍に覚醒！ （${ev.reason}）`
+          });
+        }
+      }
+    });
+  });
+
+  updateHpDisplay();
+
+  // カード振動
+  const c1 = document.querySelector('#p1-card-slot .card');
+  const c2 = document.querySelector('#p2-card-slot .card');
+  if (c1) { c1.classList.add('shake'); setTimeout(() => c1.classList.remove('shake'), 400); }
+  if (c2) { c2.classList.add('shake'); setTimeout(() => c2.classList.remove('shake'), 400); }
+
+  if (summaryRows.length > 0) {
+    // 各ニュースを改行して見やすく配置
+    const newsListHtml = `
+      <div class="cutin-news-list">
+        ${summaryRows.map(row => `<div class="cutin-news-row ${row.type}-row">${row.html}</div>`).join('')}
+      </div>
+    `;
+    const guideHtml = `<div style="margin-top:6px; font-size:13px; color:#38bdf8; font-weight:bold;">👉 ニュースを確認したら、下の「⏭ 市場オープン（開戦）へ進む」を押してください</div>`;
+    setCutin(
+      `📰 【朝刊ニュース直撃！】開戦前気配値が確定！`,
+      newsListHtml + guideHtml,
+      "damage"
+    );
+    summaryRows.forEach(item => addLog(item.log, "log-event"));
+  } else {
+    setCutin(
+      `📰 【朝刊ニュースチェック完了】今朝のニュースは両社に無風！`,
+      `対戦両社ともに通常HPで市場オープンを迎えます。<div style="margin-top:6px; font-size:13px; color:#38bdf8; font-weight:bold;">👉 下の「⏭ 市場オープン（開戦）へ進む」を押してください</div>`,
+      "event"
+    );
+    addLog("📰 【朝刊ニュースチェック】今朝のニュースは対戦両社に直接の影響はありませんでした。", "log-event");
+  }
+}
+
+// バトル開始（開戦ボタン押下時：朝刊ニュース直撃フェーズ）
+function startBattle() {
+  if (battlePhase !== "SELECT") return;
+
+  battlePhase = "MORNING_NEWS";
+  document.getElementById('p1Select').disabled = true;
+  document.getElementById('p2Select').disabled = true;
+
+  document.getElementById('startBtn').style.display = 'none';
+
+  // 次のステップボタンとオートボタンを表示
+  const nextBtn = document.getElementById('nextTurnBtn');
+  nextBtn.innerText = "⏭ 市場オープン（開戦）へ進む";
+  nextBtn.style.display = 'inline-flex';
+  document.getElementById('autoToggleBtn').style.display = 'inline-flex';
+
+  p1.cardElem = document.querySelector('#p1-card-slot .card');
+  p2.cardElem = document.querySelector('#p2-card-slot .card');
+  p1.cardElem.classList.remove('defeated');
+  p2.cardElem.classList.remove('defeated');
+
+  // ステップ1：朝刊ニュース直撃（手動待機なので自動タイマーなし！）
+  applyMorningNews();
+
+  // オートがONの場合のみ自動で次へ
+  if (isAutoPlay) {
+    battleInterval = setInterval(advanceBattleStep, 2600);
+  }
+}
+
+// ユーザーが手動で1ステップ進める（朝刊直撃読了 → 市場オープン → ターン1 → ターン2...）
+function stepTurnManual() {
+  // 手動で押されたらオートタイマーを止めて手動優先
+  if (battleInterval) {
+    clearInterval(battleInterval);
+    battleInterval = null;
+    isAutoPlay = false;
+    const statusElem = document.getElementById('autoStatusText');
+    if (statusElem) {
+      statusElem.innerText = "OFF (手動)";
+      statusElem.style.color = "#94a3b8";
+    }
+    const btn = document.getElementById('autoToggleBtn');
+    if (btn) btn.classList.remove('active');
+  }
+
+  advanceBattleStep();
+}
+
+// 手動・オート共通の進行ステップ関数
+function advanceBattleStep() {
+  if (battlePhase === "MORNING_NEWS") {
+    // 朝刊ニュース読み終わり → 市場オープンへ進む
+    proceedMarketOpen();
+  } else if (battlePhase === "MARKET_OPEN") {
+    // 市場オープンテロップ読み終わり → 第1ターン開始
+    battlePhase = "FIGHTING";
+    isBattleRunning = true;
+    document.getElementById('nextTurnBtn').innerText = "⏭ 次のターンへ進む";
+    processTurn();
+  } else if (battlePhase === "FIGHTING") {
+    // 通常のターン進行
+    processTurn();
+  }
+}
+
+// 市場オープン演出
+function proceedMarketOpen() {
+  battlePhase = "MARKET_OPEN";
+  document.getElementById('nextTurnBtn').innerText = "⏭ 第1ターンを開始する";
+
+  const openMsg = `🚨 【前場寄り付き】市場オープン！ 『${p1.name}』 vs 『${p2.name}』！ 朝刊の波乱を背負って開戦！`;
+  setCutin(
+    "🚨 市場オープン！ 東証の鐘が鳴り響く！",
+    `『${p1.name}』 vs 『${p2.name}』！ <div style="margin-top:5px; font-size:13px; color:#38bdf8; font-weight:bold;">👉 「第1ターンを開始する」を押してください！</div>`,
+    "event"
+  );
+  addLog(openMsg, "log-event");
+}
+
+// オート／手動の切り替え
+function toggleAutoPlay() {
+  isAutoPlay = !isAutoPlay;
+  const statusElem = document.getElementById('autoStatusText');
+  const btn = document.getElementById('autoToggleBtn');
+
+  if (isAutoPlay) {
+    statusElem.innerText = "ON (自動)";
+    statusElem.style.color = "#22c55e";
+    btn.classList.add('active');
+    if (!battleInterval && battlePhase !== "SELECT" && battlePhase !== "ENDED") {
+      advanceBattleStep(); // すぐに1ステップ進めてからオート開始
+      battleInterval = setInterval(advanceBattleStep, 2600);
+    }
+  } else {
+    statusElem.innerText = "OFF (手動)";
+    statusElem.style.color = "#94a3b8";
+    btn.classList.remove('active');
+    if (battleInterval) {
+      clearInterval(battleInterval);
+      battleInterval = null;
+    }
+  }
+}
+
+function processTurn() {
+  if (p1.currentHp <= 0 || p2.currentHp <= 0) {
+    endBattle();
+    return;
+  }
+
+  // ターン3：突発ニュース乱入（対戦カード関連ニュース限定フィルター）
+  if (turn === 3) {
+    const intradayPool = TODAY_EVENTS.filter(ev => ev.timing === "INTRADAY" || ev.timing === "BOTH");
+    
+    // 対戦中の2社（p1 または p2）の個別銘柄コードまたは業種に該当するニュースを最優先抽出
+    let matchedEvents = intradayPool.filter(ev => {
+      if (ev.targetScope === "ALL") return true;
+      const p1Hit = (ev.targetSectors && ev.targetSectors.includes(p1.sector)) || (ev.targetCodes && ev.targetCodes.includes(p1.code));
+      const p2Hit = (ev.targetSectors && ev.targetSectors.includes(p2.sector)) || (ev.targetCodes && ev.targetCodes.includes(p2.code));
+      return p1Hit || p2Hit;
+    });
+
+    // 該当ニュースがなければ全体（ALL）マクロニュースへフォールバック
+    if (matchedEvents.length === 0) {
+      matchedEvents = intradayPool.filter(ev => ev.targetScope === "ALL");
+      if (matchedEvents.length === 0) matchedEvents = intradayPool;
+    }
+
+    const ev = matchedEvents[Math.floor(Math.random() * matchedEvents.length)];
+    setCutin(ev.cutinTop, ev.cutinBottom, "event");
+    addLog(`📰 【場中速報】${ev.newsTitle}（${ev.reason}）`, "log-event");
+
+    [p1, p2].forEach(p => {
+      let isTarget = false;
+      if (ev.targetScope === "ALL") isTarget = true;
+      if (ev.targetSectors && ev.targetSectors.includes(p.sector)) isTarget = true;
+      if (ev.targetCodes && ev.targetCodes.includes(p.code)) isTarget = true;
+
+      if (isTarget) {
+        if (ev.effectType === "DAMAGE" || ev.effectType === "DAMAGE_AND_BREAK") {
+          if (p.code !== "7974") {
+            p.currentHp = Math.max(0, p.currentHp - ev.value);
+            p.cardElem.classList.add('shake');
+            setTimeout(() => p.cardElem.classList.remove('shake'), 400);
+            addLog(`💥 【場中直撃】『${p.name}』に -${ev.value} dmg！`, "log-damage");
+          } else {
+            addLog(`🛡️ 『任天堂』は「無借金経営の絶対防壁」で場中ダメージを無効化した！`, "log-buff");
+          }
+        } else if (ev.effectType === "HEAL") {
+          p.currentHp = p.currentHp + ev.value; // HPマックスを超えて上限突破
+          const overhealBadge = p.currentHp > p.maxHp ? ` (+${p.currentHp - p.maxHp}突破!)` : "";
+          addLog(`💖 【場中追い風】『${p.name}』が +${ev.value} HP上限突破！${overhealBadge}`, "log-buff");
+        } else if (ev.effectType === "BUFF_ATK") {
+          p.attack1.dmg = Math.floor(p.attack1.dmg * ev.value);
+          p.attack2.dmg = Math.floor(p.attack2.dmg * ev.value);
+          addLog(`⚔️ 【場中覚醒】『${p.name}』の攻撃力が ${ev.value}倍にパワーアップ！`, "log-buff");
+        }
+      }
+    });
+
+    updateHpDisplay();
+    turn++;
+    if (p1.currentHp <= 0 || p2.currentHp <= 0) endBattle();
+    return;
+  }
+
+  const isP1Turn = (turn % 2 === 1);
+  const attacker = isP1Turn ? p1 : p2;
+  const defender = isP1Turn ? p2 : p1;
+  const lungeClass = isP1Turn ? 'attack-lunge-left' : 'attack-lunge-right';
+
+  // 突進演出
+  attacker.cardElem.classList.add(lungeClass);
+  setTimeout(() => attacker.cardElem.classList.remove(lungeClass), 400);
+
+  // ★市場ボラティリティシステム（ターン経過による相場過熱メカニクス）
+  let marketMultiplier = 1.0;
+  let marketPhaseName = "前場";
+  if (turn >= 9) {
+    marketMultiplier = 2.0;
+    marketPhaseName = "大引け直前・乱高下";
+  } else if (turn >= 5) {
+    marketMultiplier = 1.5;
+    marketPhaseName = "後場・出来高急増";
+  }
+
+  // フェーズ移行ターンでのアナウンス
+  if (turn === 5) {
+    addLog("📈 【後場突入】市場の出来高が急増！ ボラティリティ上昇により全ダメージが1.5倍に激化！", "log-buff");
+  } else if (turn === 9) {
+    addLog("🔥 【大引け直前】相場過熱クライマックス！ 乱高下モードにより全ダメージが2.0倍へ跳ね上がる！", "log-damage");
+  }
+
+  // ワザ選択
+  const useSkill2 = (Math.random() > 0.45);
+  const atk = useSkill2 ? attacker.attack2 : attacker.attack1;
+  let dmg = atk.dmg;
+  let notes = [];
+
+  // コメダの逆写真詐欺特性（+35）
+  if (attacker.ability.name.includes("逆写真詐欺")) {
+    dmg += 35;
+    notes.push("デカ盛り+35");
+  }
+
+  // 特殊ギャンブル技
+  let isGambleFail = false;
+  if (dmg >= 900) {
+    const success = (Math.random() < 0.35);
+    if (success) {
+      dmg = 9999;
+      notes.push("奇跡の超特大打点！");
+    } else {
+      dmg = 0;
+      isGambleFail = true;
+      attacker.currentHp = Math.max(0, attacker.currentHp - 80);
+      setCutin(`💥 『${attacker.name}』の『${atk.name}』失敗！`, `ミッション失敗で自爆！ <span class="dmg-highlight">-80 自傷dmg</span>`, "damage");
+      addLog(`💥 『${attacker.name}』の『${atk.name}』失敗！ 自爆して80自傷ダメージ！`);
+    }
+  }
+
+  if (!isGambleFail) {
+    // 市場ボラティリティ倍率の適用
+    if (marketMultiplier > 1.0) {
+      dmg = Math.floor(dmg * marketMultiplier);
+      notes.push(`${marketPhaseName} x${marketMultiplier}`);
+    }
+
+    // 防御特性計算
+    if (dmg > 0 && defender.ability.name.includes("割安装甲")) {
+      dmg = Math.max(10, dmg - 30);
+      notes.push("割安装甲-30");
+    }
+
+    // ニトリの円高防御
+    if (defender.code === "9843" && turn >= 4) {
+      dmg = Math.floor(dmg * 0.7);
+      notes.push("ニトリ円高防御");
+    }
+
+    // 被弾処理
+    defender.currentHp = Math.max(0, defender.currentHp - dmg);
+    defender.cardElem.classList.add('shake');
+    setTimeout(() => defender.cardElem.classList.remove('shake'), 400);
+
+    const noteStr = notes.length > 0 ? `<span class="note-highlight">(${notes.join(", ")})</span>` : "";
+    
+    setCutin(
+      `⚔️ ${attacker.name}：『${atk.name}』炸裂！！`,
+      `💥 ${defender.name}に <span class="dmg-highlight">${dmg}</span> ダメージ！！${noteStr}`,
+      "damage"
+    );
+
+    const logStr = `⚔️ [T${turn}] ${attacker.name}：『${atk.name}』！ ${defender.name}に <span class="log-damage">${dmg}</span> dmg！ ${notes.length > 0 ? '(' + notes.join(', ') + ')' : ''}`;
+    addLog(logStr);
+  }
+
+  // リジェネ特性（JT、武田薬品、KDDIなど）
+  if (attacker.ability.desc.includes("回復") || attacker.ability.name.includes("リジェネ")) {
+    const healVal = attacker.code === "4502" ? 40 : 60; // 武田薬品は40、他は60
+    attacker.currentHp = Math.min(attacker.maxHp, attacker.currentHp + healVal);
+    addLog(`💖 ${attacker.name}の特性『${attacker.ability.name}』発動！ HP${healVal}回復！`, "log-buff");
+  }
+
+  updateHpDisplay();
+
+  if (p1.currentHp <= 0 || p2.currentHp <= 0) {
+    endBattle();
+    return;
+  }
+
+  turn++;
+}
+
+function endBattle() {
+  if (battleInterval) {
+    clearInterval(battleInterval);
+    battleInterval = null;
+  }
+  battlePhase = "ENDED";
+  isBattleRunning = false;
+
+  document.getElementById('nextTurnBtn').style.display = 'none';
+  document.getElementById('autoToggleBtn').style.display = 'none';
+
+  if (p1.currentHp <= 0) {
+    p1.cardElem.classList.add('defeated');
+    setCutin(
+      `🏆 【大引け】${p1.name}が上場廃止（KO）！！`,
+      `『${p2.name}』が圧倒的資本力で市場を完全制覇！！`,
+      "event"
+    );
+    addLog(`🏆 【大引け】${p1.name}が上場廃止！ 『${p2.name}』の完全勝利！！`, "log-buff");
+  } else {
+    p2.cardElem.classList.add('defeated');
+    setCutin(
+      `🏆 【大引け】${p2.name}が買収（KO）完了！！`,
+      `『${p1.name}』が市場の勝者として君臨！！`,
+      "event"
+    );
+    addLog(`🏆 【大引け】${p2.name}が買収（KO）された！ 『${p1.name}』の勝利！！`, "log-buff");
+  }
+
+  document.getElementById('resetBtn').style.display = 'inline-block';
+}
+
+function resetBattle() {
+  p1.currentHp = p1.maxHp;
+  p2.currentHp = p2.maxHp;
+  turn = 1;
+  battlePhase = "SELECT";
+  hasMorningNewsApplied = false;
+  isBattleRunning = false;
+  isAutoPlay = false;
+  p1.cardElem.classList.remove('defeated', 'shake');
+  p2.cardElem.classList.remove('defeated', 'shake');
+  updateHpDisplay();
+
+  const statusElem = document.getElementById('autoStatusText');
+  if (statusElem) {
+    statusElem.innerText = "OFF (手動)";
+    statusElem.style.color = "#94a3b8";
+  }
+  const autoBtn = document.getElementById('autoToggleBtn');
+  if (autoBtn) autoBtn.classList.remove('active');
+
+  setCutin("🔔 企業を選んで「開戦！（朝刊ニュース直撃）」を押してください", "開戦と同時に今朝のリアル経済ニュースが両社を直撃します", "normal");
+  document.getElementById('logMonitor').innerHTML = '<div class="log-line">🔔 バトルの詳細ログがここに蓄積されます。</div>';
+  document.getElementById('startBtn').style.display = 'inline-block';
+  document.getElementById('startBtn').disabled = false;
+  document.getElementById('startBtn').innerText = "🔔 開戦！（朝刊ニュース直撃）";
+  document.getElementById('nextTurnBtn').style.display = 'none';
+  document.getElementById('autoToggleBtn').style.display = 'none';
+  document.getElementById('resetBtn').style.display = 'none';
+  document.getElementById('p1Select').disabled = false;
+  document.getElementById('p2Select').disabled = false;
+}
+
+window.onload = initSelects;
+</script>
+
+</body>
+</html>
